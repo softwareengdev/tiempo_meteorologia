@@ -6,6 +6,7 @@ import {
   CurrentWeatherWidget, HourlyChartWidget, DailyForecastWidget,
   HourlyDetailWidget, WindChartWidget, PressureChartWidget, SunriseSunsetWidget,
 } from '@/components/widgets';
+import { AIChat } from '@/components/ai';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
@@ -46,6 +47,7 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+      <AIChat />
     </div>
   );
 }

@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     "La plataforma de meteorología más avanzada del mundo. Mapa interactivo, IA explicativa, multi-modelo y +80 capas profesionales.",
   keywords: ["meteorología", "tiempo", "pronóstico", "mapa", "clima", "weather"],
   authors: [{ name: "AetherCast" }],
+  manifest: "/manifest.json",
   openGraph: {
     title: "AetherCast — Meteorología Avanzada",
     description: "Mapa interactivo inmersivo con +80 capas meteorológicas profesionales.",
