@@ -6,3 +6,6 @@ export { WindChartWidget, PressureChartWidget } from './weather-charts';
 export { SunriseSunsetWidget } from './sunrise-sunset';
 export { MeteogramWidget } from './meteogram';
 export { HumidityWidget } from './humidity';
+export { ModelComparisonWidget } from './model-comparison';
+export { AlertsWidget } from './alerts';
+export { ClimateHistoryWidget } from './climate-history';
