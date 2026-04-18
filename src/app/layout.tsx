@@ -1,44 +1,138 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Providers } from "@/components/providers";
-import "./globals.css";
+import type { Metadata, Viewport } from 'next';
+import { Inter, Manrope, JetBrains_Mono } from 'next/font/google';
+import { Providers } from '@/components/providers';
+import { JsonLd, organizationJsonLd, websiteJsonLd, webApplicationJsonLd, SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from '@/lib/seo';
+import './globals.css';
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+const inter = Inter({
+  variable: '--font-sans',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const manrope = Manrope({
+  variable: '--font-display',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: '--font-mono',
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
-  title: "AetherCast — Meteorología Avanzada",
-  description:
-    "La plataforma de meteorología más avanzada del mundo. Mapa interactivo, IA explicativa, multi-modelo y +80 capas profesionales.",
-  keywords: ["meteorología", "tiempo", "pronóstico", "mapa", "clima", "weather"],
-  authors: [{ name: "AetherCast" }],
-  manifest: "/manifest.json",
-  openGraph: {
-    title: "AetherCast — Meteorología Avanzada",
-    description: "Mapa interactivo inmersivo con +80 capas meteorológicas profesionales.",
-    type: "website",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: `${SITE_NAME} — El tiempo más preciso del planeta`,
+    template: `%s · ${SITE_NAME}`,
   },
+  description: SITE_DESCRIPTION,
+  keywords: SITE_KEYWORDS,
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME, url: SITE_URL }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  category: 'Weather',
+  manifest: '/manifest.json',
+  alternates: {
+    canonical: '/',
+    languages: { 'es-ES': '/', 'en-US': '/?lang=en' },
+  },
+  formatDetection: { telephone: false, email: false, address: false },
+  openGraph: {
+    type: 'website',
+    locale: 'es_ES',
+    alternateLocale: ['en_US', 'pt_BR'],
+    url: SITE_URL,
+    title: `${SITE_NAME} — Meteorología profesional, sin anuncios`,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_NAME,
+    images: [{
+      url: '/opengraph-image',
+      width: 1200,
+      height: 630,
+      alt: `${SITE_NAME} — el tiempo más preciso del planeta`,
+    }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${SITE_NAME} — El tiempo más preciso del planeta`,
+    description: SITE_DESCRIPTION,
+    site: '@aethercast',
+    creator: '@aethercast',
+    images: ['/opengraph-image'],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    nocache: false,
+    googleBot: {
+      index: true,
+      follow: true,
+      noimageindex: false,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: '/icons/icon.svg', type: 'image/svg+xml' },
+    ],
+    apple: [{ url: '/icons/icon.svg' }],
+    shortcut: '/icons/icon.svg',
+  },
+  appleWebApp: {
+    capable: true,
+    title: SITE_NAME,
+    statusBarStyle: 'black-translucent',
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
+    yandex: process.env.NEXT_PUBLIC_YANDEX_VERIFICATION,
+  },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+    'mobile-web-app-capable': 'yes',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b1020' },
+  ],
+  colorScheme: 'dark light',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="es"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-gray-950 text-white">
+      <head>
+        <link rel="preconnect" href="https://api.open-meteo.com" />
+        <link rel="preconnect" href="https://geocoding-api.open-meteo.com" />
+        <link rel="preconnect" href="https://basemaps.cartocdn.com" />
+        <link rel="dns-prefetch" href="https://api.open-meteo.com" />
+        <JsonLd data={organizationJsonLd} />
+        <JsonLd data={websiteJsonLd} />
+        <JsonLd data={webApplicationJsonLd} />
+      </head>
+      <body className="flex min-h-dvh flex-col bg-[#0b1020] text-white">
         <Providers>{children}</Providers>
       </body>
     </html>

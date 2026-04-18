@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const runtime = 'edge';
+export const preferredRegion = 'auto';
+
 const OPEN_METEO_BASE = process.env.NEXT_PUBLIC_OPEN_METEO_BASE || 'https://api.open-meteo.com';
 
 export async function GET(request: NextRequest) {

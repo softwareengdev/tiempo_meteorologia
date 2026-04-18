@@ -117,14 +117,210 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* ==========================================================================
+   AetherCast Premium Design System
+   ========================================================================== */
+
+:root {
+  /* Brand colors — bespoke meteorology palette */
+  --brand-aether-50:  #eef6ff;
+  --brand-aether-100: #d9eaff;
+  --brand-aether-200: #bcd9ff;
+  --brand-aether-300: #8dbeff;
+  --brand-aether-400: #5697ff;
+  --brand-aether-500: #2f72ff;
+  --brand-aether-600: #1a52f5;
+  --brand-aether-700: #163fdb;
+  --brand-aether-800: #1836ad;
+  --brand-aether-900: #1a3389;
+  --brand-aether-950: #142053;
+
+  --brand-amber: #ffb547;
+  --brand-storm: #6b5cff;
+  --brand-rain: #38bdf8;
+  --brand-snow: #e0f2fe;
+
+  /* Premium gradients */
+  --gradient-aurora: linear-gradient(135deg, #2f72ff 0%, #6b5cff 50%, #ff5fb0 100%);
+  --gradient-storm: linear-gradient(135deg, #0b1020 0%, #142053 60%, #1a3389 100%);
+  --gradient-glow: radial-gradient(1200px 600px at 50% -10%, rgba(47,114,255,0.25), transparent 60%);
+  --gradient-card: linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+
+  /* Premium shadows (soft, layered) */
+  --shadow-soft: 0 1px 2px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-elevated: 0 4px 12px rgba(0,0,0,0.10), 0 20px 60px rgba(0,0,0,0.18);
+  --shadow-glow: 0 0 0 1px rgba(255,255,255,0.06), 0 8px 32px rgba(47,114,255,0.18);
+
+  /* Type scale (fluid clamp for responsive) */
+  --fs-hero: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+  --fs-h1: clamp(2rem, 4vw + 0.5rem, 3.5rem);
+  --fs-h2: clamp(1.5rem, 3vw + 0.25rem, 2.5rem);
+  --fs-lead: clamp(1rem, 1vw + 0.75rem, 1.25rem);
+
+  /* Safe area insets for mobile */
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: 'cv11', 'ss01', 'ss03';
+    overscroll-behavior-y: none;
   }
-  html {
-    @apply font-sans;
+  ::selection {
+    background: var(--brand-aether-500);
+    color: white;
   }
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display, var(--font-sans));
+    letter-spacing: -0.02em;
+    font-weight: 700;
+  }
+  /* Premium focus rings */
+  :focus-visible {
+    outline: 2px solid var(--brand-aether-400);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  /* Better mobile tap targets */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ==========================================================================
+   Custom Utilities
+   ========================================================================== */
+@layer utilities {
+  .glass {
+    background: rgba(15, 23, 42, 0.55);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .glass-light {
+    background: rgba(255, 255, 255, 0.04);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .text-gradient-aurora {
+    background: var(--gradient-aurora);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-sky {
+    background: linear-gradient(135deg, #38bdf8 0%, #2f72ff 50%, #6b5cff 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .bg-grid {
+    background-image:
+      linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  }
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+  .shadow-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  .scroll-snap-x {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+  .scroll-snap-item {
+    scroll-snap-align: start;
+  }
+  .pb-safe { padding-bottom: var(--safe-bottom); }
+  .pt-safe { padding-top: var(--safe-top); }
+  .h-dvh { height: 100dvh; }
+  .min-h-dvh { min-height: 100dvh; }
+
+  /* Animated aurora glow */
+  .aurora-bg::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: var(--gradient-aurora);
+    filter: blur(80px);
+    opacity: 0.25;
+    animation: aurora 20s ease-in-out infinite alternate;
+    z-index: -1;
+  }
+  @keyframes aurora {
+    0%   { transform: translate(0, 0) rotate(0deg); }
+    50%  { transform: translate(5%, -5%) rotate(180deg); }
+    100% { transform: translate(-5%, 5%) rotate(360deg); }
+  }
+  /* Marquee for ticker */
+  @keyframes marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .animate-marquee {
+    animation: marquee 40s linear infinite;
+  }
+  /* Subtle shimmer for skeletons */
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+}
+
+/* ==========================================================================
+   Mobile-first refinements
+   ========================================================================== */
+@media (max-width: 640px) {
+  html { font-size: 15px; }
+  .recharts-wrapper { font-size: 9px; }
+}
+
+/* MapLibre dark popups override */
+.maplibregl-popup-content {
+  background: rgba(11, 16, 32, 0.95) !important;
+  color: white !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 12px !important;
+  font-family: var(--font-sans) !important;
+}
+.maplibregl-popup-tip { display: none !important; }
+.maplibregl-ctrl-group {
+  background: rgba(11, 16, 32, 0.85) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+}
+.maplibregl-ctrl-group button {
+  filter: invert(1) brightness(1.5);
 }

@@ -9,3 +9,6 @@ export { HumidityWidget } from './humidity';
 export { ModelComparisonWidget } from './model-comparison';
 export { AlertsWidget } from './alerts';
 export { ClimateHistoryWidget } from './climate-history';
+export { AirQualityWidget } from './air-quality';
+export { MarineWidget } from './marine';
+export { AstronomyWidget } from './astronomy';

@@ -66,7 +66,7 @@ export function Header() {
       <div className="flex items-center gap-4">
         <LocationSearch />
         <ThemeToggle />
-        <div className="hidden items-center gap-2 md:flex">
+        <div className="hidden items-center gap-2 lg:flex">
           <span className="text-xs text-white/40">📍</span>
           <span className="max-w-48 truncate text-xs text-white/60">
             {locationName}

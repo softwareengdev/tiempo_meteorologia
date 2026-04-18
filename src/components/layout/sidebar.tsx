@@ -36,7 +36,14 @@ export function Sidebar() {
   if (!sidebarOpen) return null;
 
   return (
-    <aside className="fixed top-14 bottom-0 left-0 z-30 flex w-64 flex-col overflow-y-auto border-r border-white/5 bg-gray-950/90 backdrop-blur-xl">
+    <>
+      {/* Mobile backdrop */}
+      <div
+        onClick={() => useWeatherStore.getState().toggleSidebar()}
+        className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm md:hidden"
+        aria-hidden="true"
+      />
+      <aside className="fixed top-14 bottom-16 left-0 z-30 flex w-72 flex-col overflow-y-auto border-r border-white/10 bg-[#0b1020]/95 backdrop-blur-xl md:bottom-0 md:w-64">
       {/* Model selector */}
       <div className="border-b border-white/5 p-4">
         <label className="mb-2 block text-xs font-semibold tracking-wider text-white/50 uppercase">
@@ -88,9 +95,10 @@ export function Sidebar() {
 
       <div className="border-t border-white/5 p-4">
         <p className="text-center text-xs text-white/30">
-          AetherCast v1.0 — Datos: Open-Meteo
+          AetherCast v2.0 — Datos: Open-Meteo
         </p>
       </div>
     </aside>
+    </>
   );
 }
