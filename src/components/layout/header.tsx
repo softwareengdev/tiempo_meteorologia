@@ -1,6 +1,6 @@
 'use client';
 
-import { Cloud, Menu, X, LayoutDashboard, Map } from 'lucide-react';
+import { Cloud, Menu, X, LayoutDashboard, Map, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LocationSearch } from './location-search';
@@ -49,6 +49,16 @@ export function Header() {
           >
             <LayoutDashboard className="h-3.5 w-3.5" />
             Dashboard
+          </Link>
+          <Link
+            href="/pro"
+            className={cn(
+              'flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors',
+              pathname === '/pro' ? 'bg-purple-500/20 text-purple-400' : 'text-white/50 hover:text-white/80',
+            )}
+          >
+            <Activity className="h-3.5 w-3.5" />
+            Pro
           </Link>
         </nav>
       </div>

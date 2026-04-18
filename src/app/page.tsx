@@ -5,6 +5,7 @@ import { Header, Sidebar } from '@/components/layout';
 import {
   CurrentWeatherWidget, HourlyChartWidget, DailyForecastWidget,
   HourlyDetailWidget, WindChartWidget, PressureChartWidget, SunriseSunsetWidget,
+  AlertsWidget,
 } from '@/components/widgets';
 import { AIChat } from '@/components/ai';
 import { useWeatherStore } from '@/lib/stores';
@@ -38,6 +39,7 @@ export default function HomePage() {
           {/* Right panel with widgets */}
           <div className="absolute top-4 right-4 z-20 flex w-96 max-h-[calc(100vh-5rem)] flex-col gap-4 overflow-y-auto pr-1">
             <CurrentWeatherWidget />
+            <AlertsWidget />
             <SunriseSunsetWidget />
             <HourlyChartWidget />
             <HourlyDetailWidget />
