@@ -4,3 +4,5 @@ export { DailyForecastWidget } from './daily-forecast';
 export { HourlyDetailWidget } from './hourly-detail';
 export { WindChartWidget, PressureChartWidget } from './weather-charts';
 export { SunriseSunsetWidget } from './sunrise-sunset';
+export { MeteogramWidget } from './meteogram';
+export { HumidityWidget } from './humidity';
