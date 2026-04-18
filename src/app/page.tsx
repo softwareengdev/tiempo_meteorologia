@@ -2,7 +2,10 @@
 
 import dynamic from 'next/dynamic';
 import { Header, Sidebar } from '@/components/layout';
-import { CurrentWeatherWidget, HourlyChartWidget, DailyForecastWidget } from '@/components/widgets';
+import {
+  CurrentWeatherWidget, HourlyChartWidget, DailyForecastWidget,
+  HourlyDetailWidget, WindChartWidget, PressureChartWidget, SunriseSunsetWidget,
+} from '@/components/widgets';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +37,11 @@ export default function HomePage() {
           {/* Right panel with widgets */}
           <div className="absolute top-4 right-4 z-20 flex w-96 max-h-[calc(100vh-5rem)] flex-col gap-4 overflow-y-auto pr-1">
             <CurrentWeatherWidget />
+            <SunriseSunsetWidget />
             <HourlyChartWidget />
+            <HourlyDetailWidget />
+            <WindChartWidget />
+            <PressureChartWidget />
             <DailyForecastWidget />
           </div>
         </div>
