@@ -1,7 +1,0 @@
-name = "tiempo-meteorologia"
-compatibility_date = "2025-04-01"
-compatibility_flags = ["nodejs_compat"]
-pages_build_output_dir = ".vercel/output/static"
-
-[vars]
-NEXT_PUBLIC_SITE_URL = "https://tiempo-meteorologia.pages.dev"

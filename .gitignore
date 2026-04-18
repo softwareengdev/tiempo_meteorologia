@@ -61,3 +61,7 @@ workbox-*.js
 
 # Misc
 *.log
+
+.open-next/
+.vercel/
+

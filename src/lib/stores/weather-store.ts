@@ -21,6 +21,15 @@ interface WeatherStore {
   selectedModel: string;
   setSelectedModel: (model: string) => void;
 
+  // Forecast time scrub (hours offset from now, 0..47)
+  forecastHourOffset: number;
+  setForecastHourOffset: (h: number) => void;
+
+  // Favorites
+  favorites: { name: string; coords: Coordinates }[];
+  addFavorite: (name: string, coords: Coordinates) => void;
+  removeFavorite: (name: string) => void;
+
   // UI
   sidebarOpen: boolean;
   toggleSidebar: () => void;
@@ -76,6 +85,19 @@ export const useWeatherStore = create<WeatherStore>()(
 
       setSelectedModel: (model) => set({ selectedModel: model }),
 
+      forecastHourOffset: 0,
+      setForecastHourOffset: (h) => set({ forecastHourOffset: Math.max(0, Math.min(47, h)) }),
+
+      favorites: [],
+      addFavorite: (name, coords) =>
+        set((state) =>
+          state.favorites.some((f) => f.name === name)
+            ? state
+            : { favorites: [...state.favorites, { name, coords }] },
+        ),
+      removeFavorite: (name) =>
+        set((state) => ({ favorites: state.favorites.filter((f) => f.name !== name) })),
+
       toggleSidebar: () =>
         set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
@@ -87,6 +109,7 @@ export const useWeatherStore = create<WeatherStore>()(
         locationName: state.locationName,
         activeLayers: state.activeLayers,
         selectedModel: state.selectedModel,
+        favorites: state.favorites,
       }),
     },
   ),

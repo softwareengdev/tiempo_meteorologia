@@ -1,23 +1,30 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useWeatherStore } from '@/lib/stores';
+import { useWeatherOverlay } from './weather-overlay';
+import { MapLegend } from './map-legend';
+import { TimeSlider } from './time-slider';
+import { WindParticles } from './wind-particles';
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 export function WeatherMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<maplibregl.Map | null>(null);
+  const mapRef = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
-  const { mapView, setMapView, selectedLocation, setSelectedLocation, locationName } =
+  const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null);
+  const { mapView, setMapView, selectedLocation, setSelectedLocation, locationName, activeLayers } =
     useWeatherStore();
 
-  const initMap = useCallback(() => {
-    if (!mapContainer.current || map.current) return;
+  useWeatherOverlay({ map: mapInstance, activeLayers });
 
-    map.current = new maplibregl.Map({
+  const initMap = useCallback(() => {
+    if (!mapContainer.current || mapRef.current) return;
+
+    const m = new maplibregl.Map({
       container: mapContainer.current,
       style: MAP_STYLE,
       center: [mapView.longitude, mapView.latitude],
@@ -26,17 +33,12 @@ export function WeatherMap() {
       bearing: mapView.bearing || 0,
       attributionControl: false,
     });
+    mapRef.current = m;
 
-    map.current.addControl(
-      new maplibregl.NavigationControl({ visualizePitch: true }),
-      'bottom-right',
-    );
-    map.current.addControl(new maplibregl.ScaleControl(), 'bottom-left');
-    map.current.addControl(
-      new maplibregl.AttributionControl({ compact: true }),
-      'bottom-left',
-    );
-    map.current.addControl(
+    m.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
+    m.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+    m.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
+    m.addControl(
       new maplibregl.GeolocateControl({
         positionOptions: { enableHighAccuracy: true },
         trackUserLocation: true,
@@ -44,19 +46,18 @@ export function WeatherMap() {
       'bottom-right',
     );
 
-    map.current.on('moveend', () => {
-      if (!map.current) return;
-      const center = map.current.getCenter();
+    m.on('moveend', () => {
+      const center = m.getCenter();
       setMapView({
         longitude: center.lng,
         latitude: center.lat,
-        zoom: map.current.getZoom(),
-        pitch: map.current.getPitch(),
-        bearing: map.current.getBearing(),
+        zoom: m.getZoom(),
+        pitch: m.getPitch(),
+        bearing: m.getBearing(),
       });
     });
 
-    map.current.on('click', async (e) => {
+    m.on('click', async (e) => {
       const { lng, lat } = e.lngLat;
       setSelectedLocation(
         { latitude: lat, longitude: lng },
@@ -64,37 +65,37 @@ export function WeatherMap() {
       );
     });
 
-    // Add initial marker
+    m.on('load', () => setMapInstance(m));
+
     if (selectedLocation) {
       marker.current = new maplibregl.Marker({ color: '#38bdf8' })
         .setLngLat([selectedLocation.longitude, selectedLocation.latitude])
-        .addTo(map.current);
+        .addTo(m);
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     initMap();
     return () => {
-      map.current?.remove();
-      map.current = null;
+      mapRef.current?.remove();
+      mapRef.current = null;
     };
   }, [initMap]);
 
-  // Update marker when location changes
   useEffect(() => {
-    if (!map.current || !selectedLocation) return;
+    if (!mapRef.current || !selectedLocation) return;
 
     if (marker.current) {
       marker.current.setLngLat([selectedLocation.longitude, selectedLocation.latitude]);
     } else {
       marker.current = new maplibregl.Marker({ color: '#38bdf8' })
         .setLngLat([selectedLocation.longitude, selectedLocation.latitude])
-        .addTo(map.current);
+        .addTo(mapRef.current);
     }
 
-    map.current.flyTo({
+    mapRef.current.flyTo({
       center: [selectedLocation.longitude, selectedLocation.latitude],
-      zoom: Math.max(map.current.getZoom(), 8),
+      zoom: Math.max(mapRef.current.getZoom(), 8),
       duration: 1500,
     });
   }, [selectedLocation]);
@@ -102,11 +103,13 @@ export function WeatherMap() {
   return (
     <div className="relative h-full w-full">
       <div ref={mapContainer} className="h-full w-full" />
-      {/* Map overlay info */}
-      <div className="pointer-events-none absolute bottom-16 left-4 z-10">
-        <div className="pointer-events-auto rounded-xl border border-white/10 bg-gray-950/80 px-3 py-2 backdrop-blur-md">
-          <p className="text-xs text-white/60">
-            📍 {locationName} | Zoom: {mapView.zoom.toFixed(1)}
+      <WindParticles map={mapInstance} />
+      <MapLegend />
+      <TimeSlider />
+      <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
+        <div className="pointer-events-auto rounded-full border border-white/10 bg-[#0b1020]/85 px-4 py-1.5 backdrop-blur-md shadow-lg">
+          <p className="text-[13px] font-medium text-white/80">
+            📍 {locationName}
           </p>
         </div>
       </div>
