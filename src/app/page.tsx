@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Header, Sidebar, MobileBottomNav } from '@/components/layout';
+import { Header, Sidebar, MobileBottomNav, PWAInstall } from '@/components/layout';
 import {
   CurrentWeatherWidget, HourlyChartWidget, DailyForecastWidget,
   HourlyDetailWidget, WindChartWidget, PressureChartWidget, SunriseSunsetWidget,
@@ -61,6 +61,7 @@ export default function HomePage() {
       </main>
       <AIChat />
       <MobileBottomNav />
+      <PWAInstall />
     </div>
   );
 }

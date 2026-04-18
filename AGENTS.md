@@ -46,3 +46,44 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - `pnpm build` — Next.js production build (verified working).
 - `pnpm pages:build` — Cloudflare adapter (run on Linux/macOS/WSL only).
 - `pnpm deploy` — wrangler pages deploy (requires `wrangler login`).
+
+# AetherCast — Phase 3 Conventions
+
+## Map Layers (visible & functional)
+- ``useWeatherOverlay`` (in ``src/components/map/weather-overlay.tsx``) renders:
+  - **Real radar tiles** (RainViewer) for ``precipitation``, ``rain``, ``snow``, ``snowfall``.
+  - **Sampled grid circles** for all other layers (temperature, wind, clouds, pressure, humidity, visibility, UV, CAPE, dew_point, wind_gusts) — fetched live from Open-Meteo across the visible bbox, debounced on ``moveend``.
+- ``MapLegend`` shows up to 4 active layer color scales (bottom-left).
+- ``TimeSlider`` scrubs forecast hours 0–47 with play/pause; persists in store as ``forecastHourOffset``.
+- ``WindParticles`` canvas overlay activates with ``wind`` or ``wind_gusts`` layers.
+
+## Store extensions
+- ``forecastHourOffset`` (number, persisted) — sync widgets/overlay to scrubbed time.
+- ``favorites`` — ``{ name, coords }[]`` (persisted), with ``addFavorite``/``removeFavorite``.
+- DO NOT add functions on the store that call ``useWeatherStore.getState()`` — breaks TS inference. Use selectors at call site instead.
+
+## PWA
+- Service worker at ``public/sw.js`` (Cache-First for tiles, SWR for Open-Meteo).
+- Registered via ``PWAInstall`` component (also handles ``beforeinstallprompt``).
+- Mounted in main pages (``/``, ``/dashboard``, ``/pro``).
+
+## Typography
+- Base ``font-size: 17px`` (was 16). Sub-640px → 16px. ``≥1280px`` → 17.5px.
+- Body ``line-height: 1.55``.
+
+## Cloudflare Deployment (Workers)
+- Adapter: ``@opennextjs/cloudflare`` (NOT ``@cloudflare/next-on-pages`` — that's deprecated and broken on Windows).
+- Build: ``npx @opennextjs/cloudflare build`` → ``.open-next/`` (worker.js + assets/).
+- Config: ``wrangler.jsonc`` at project root with assets binding.
+- Deploy: ``npx wrangler deploy``.
+- Live URL pattern: ``https://<project>.<account>.workers.dev``.
+- Compatibility flags required: ``nodejs_compat``, ``global_fetch_strictly_public``.
+- ``wrangler.toml`` REPLACED by ``wrangler.jsonc`` (don't keep both).
+
+## RainViewer integration
+- Public, no key. Tile URL pattern: ``{host}{path}/256/{z}/{x}/{y}/{color}/{options}.png``.
+- Get current frame from ``https://api.rainviewer.com/public/weather-maps.json`` → ``radar.past[last].path``.
+- Color scheme ``4`` (Universal Blue), options ``1_1`` (smooth + snow).
+
+## Open-Meteo grid sampling
+- Endpoint accepts comma-separated lat/lon arrays for batch sampling — use this pattern, not N parallel requests.

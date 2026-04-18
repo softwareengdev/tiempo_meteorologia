@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Thermometer, Wind, CloudRain, Cloud, Eye, Sun, Gauge, Droplets, Snowflake, Zap,
+  Thermometer, Wind, CloudRain, Cloud, Eye, Sun, Gauge, Droplets, Snowflake, Zap, Star, Trash2,
 } from 'lucide-react';
 import { useWeatherStore } from '@/lib/stores';
 import type { WeatherLayer } from '@/types';
@@ -30,8 +30,10 @@ const LAYER_CONFIG: {
 ];
 
 export function Sidebar() {
-  const { sidebarOpen, activeLayers, toggleLayer, selectedModel, setSelectedModel } =
-    useWeatherStore();
+  const {
+    sidebarOpen, activeLayers, toggleLayer, selectedModel, setSelectedModel,
+    favorites, removeFavorite, setSelectedLocation,
+  } = useWeatherStore();
 
   if (!sidebarOpen) return null;
 
@@ -94,8 +96,39 @@ export function Sidebar() {
       </div>
 
       <div className="border-t border-white/5 p-4">
+        <h3 className="mb-2 flex items-center gap-2 text-xs font-semibold tracking-wider text-white/50 uppercase">
+          <Star className="h-3.5 w-3.5 text-amber-400" /> Favoritos
+        </h3>
+        {favorites.length === 0 ? (
+          <p className="text-xs text-white/30">
+            Pulsa la estrella ⭐ junto a la búsqueda para guardar ubicaciones.
+          </p>
+        ) : (
+          <ul className="space-y-1">
+            {favorites.map((f) => (
+              <li key={f.name} className="group flex items-center gap-2 rounded-lg px-2 py-1 hover:bg-white/5">
+                <button
+                  onClick={() => setSelectedLocation(f.coords, f.name)}
+                  className="flex-1 truncate text-left text-sm text-white/80 hover:text-white"
+                >
+                  📍 {f.name}
+                </button>
+                <button
+                  onClick={() => removeFavorite(f.name)}
+                  aria-label={`Quitar ${f.name} de favoritos`}
+                  className="opacity-0 transition-opacity group-hover:opacity-100"
+                >
+                  <Trash2 className="h-3.5 w-3.5 text-white/40 hover:text-red-400" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div className="border-t border-white/5 p-4">
         <p className="text-center text-xs text-white/30">
-          AetherCast v2.0 — Datos: Open-Meteo
+          AetherCast v3.0 — Datos: Open-Meteo · RainViewer
         </p>
       </div>
     </aside>
