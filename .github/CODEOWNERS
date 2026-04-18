@@ -1,0 +1,16 @@
+# AetherCast Code Owners
+# Cada línea es un patrón de archivo seguido de uno o más owners
+
+# Global
+* @softwareengdev
+
+# Core meteorological logic
+/src/lib/weather/ @softwareengdev
+/src/lib/ai/ @softwareengdev
+
+# Map components
+/src/components/map/ @softwareengdev
+
+# Infrastructure
+/.github/ @softwareengdev
+/next.config.ts @softwareengdev

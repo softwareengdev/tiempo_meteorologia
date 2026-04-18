@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AetherCast 🌤️ - La Mejor Plataforma de Meteorología Web
 
-## Getting Started
+> La página web de tiempo y meteorología más avanzada del mundo (2026). Mapa interactivo inmersivo, IA explicativa, multi-modelo y +80 capas profesionales.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-15-black?logo=nextdotjs)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)
+![Tailwind](https://img.shields.io/badge/Tailwind-4.2-38bdf8?logo=tailwindcss)
+![MapLibre](https://img.shields.io/badge/MapLibre-GL-green)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Características Principales
+
+- 🗺️ **Mapa global fullscreen** con animaciones de partículas (viento, precipitación, nieve)
+- 📊 **+80 capas meteorológicas** (temperatura, CAPE, shear, geopotencial, radar, rayos, olas, calidad del aire)
+- 🔄 **Multi-modelo inteligente** - Selección y blending de ECMWF, ICON, GFS, HRRR
+- 🤖 **IA explicativa** - Chat que explica el pronóstico en lenguaje natural
+- 📱 **Dashboard personalizable** con widgets arrastrables
+- 🔔 **Alertas push inteligentes** + histórico climático
+- 📲 **PWA 100% offline**
+- ♿ **Accesible** (WCAG AA), responsive y sin anuncios
+- 🌍 **Multi-idioma** (español por defecto)
+
+## 🚀 Tech Stack
+
+| Categoría | Tecnología |
+|-----------|-----------|
+| **Framework** | Next.js 15 (App Router) + TypeScript |
+| **Estilos** | Tailwind CSS v4 + shadcn/ui + Framer Motion |
+| **Mapas** | MapLibre GL JS + WebGL particles |
+| **Datos** | Open-Meteo API (principal) |
+| **Estado** | TanStack Query + Zustand |
+| **Gráficos** | Recharts |
+| **Auth** | NextAuth.js v5 |
+| **Despliegue** | Vercel |
+| **Testing** | Vitest + Playwright |
+
+## 📁 Estructura del Proyecto
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   ├── weather/      # Proxy a APIs meteorológicas
+│   │   ├── geocoding/    # Búsqueda de ubicaciones
+│   │   └── ai/           # Endpoint de IA explicativa
+│   ├── dashboard/        # Página principal con mapa + widgets
+│   └── location/[slug]/  # SSR por ubicación
+├── components/
+│   ├── map/              # MapLibre wrapper + layers
+│   ├── widgets/          # Hourly, meteogram, radar, etc.
+│   ├── layout/           # Header, Sidebar, Footer
+│   ├── ai/               # Chat de IA
+│   └── ui/               # shadcn components
+├── lib/
+│   ├── weather/          # Servicios Open-Meteo + blending
+│   ├── ai/               # Integración IA
+│   ├── stores/           # Zustand stores
+│   └── hooks/            # Custom hooks
+└── types/                # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Desarrollo
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Requisitos previos
+- Node.js 22+
+- pnpm 10+
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Instalación
 
-## Learn More
+```bash
+git clone https://github.com/softwareengdev/tiempo_meteorologia.git
+cd tiempo_meteorologia
+pnpm install
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Variables de entorno
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+cp .env.example .env.local
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Ejecutar en desarrollo
 
-## Deploy on Vercel
+```bash
+pnpm dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Abre [http://localhost:3000](http://localhost:3000)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Scripts disponibles
+
+| Script | Descripción |
+|--------|-------------|
+| `pnpm dev` | Servidor de desarrollo con Turbopack |
+| `pnpm build` | Build de producción |
+| `pnpm start` | Servidor de producción |
+| `pnpm lint` | Linter ESLint |
+| `pnpm format` | Formateo con Prettier |
+| `pnpm test` | Tests unitarios con Vitest |
+| `pnpm test:e2e` | Tests E2E con Playwright |
+| `pnpm type-check` | Verificación de tipos TypeScript |
+
+## 📈 Roadmap
+
+- [x] **Fase 1**: Mapa básico + Open-Meteo + capas core + búsqueda
+- [x] **Fase 2**: Capas meteorológicas avanzadas + búsqueda por ubicación
+- [x] **Fase 3**: Dashboard personalizable + widgets + gráficos
+- [x] **Fase 4**: IA chat + PWA + modo oscuro + notificaciones
+- [x] **Fase 5**: Modo Pro + comparativa multi-modelo + alertas
+
+## 🤝 Contribuir
+
+1. Fork el repositorio
+2. Crea tu branch (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -m 'feat: nueva funcionalidad'`)
+4. Push al branch (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+## 📄 Licencia
+
+MIT - Usa libremente, pero mantén crédito al proyecto original.
+
+---
+
+**AetherCast** - *La meteorología del futuro, hoy.* 🌍⚡
