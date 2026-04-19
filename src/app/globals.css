@@ -264,8 +264,9 @@
   .scroll-snap-item {
     scroll-snap-align: start;
   }
-  .pb-safe { padding-bottom: var(--safe-bottom); }
-  .pt-safe { padding-top: var(--safe-top); }
+  .pb-safe { padding-bottom: max(var(--safe-bottom), 0.5rem); }
+  .pt-safe { padding-top: max(var(--safe-top), 0.5rem); }
+  .mb-safe { margin-bottom: var(--safe-bottom); }
   .h-dvh { height: 100dvh; }
   .min-h-dvh { min-height: 100dvh; }
 
@@ -316,6 +317,45 @@
   html { font-size: 17.5px; }
 }
 
+/* Larger touch targets on coarse pointers (mobile/tablet) */
+@media (pointer: coarse) {
+  button, a, [role="button"], input[type="button"], input[type="submit"] {
+    min-height: 44px;
+  }
+  .compact-touch button, .compact-touch a { min-height: auto; }
+}
+
+/* Better thin scrollbars (Webkit + Firefox) */
+* { scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.15) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.12);
+  border-radius: 999px;
+  transition: background .2s;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* Hide scrollbar utility for horizontal scroll lists */
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Premium card surface w/ subtle inner shadow + hover lift */
+.card-surface {
+  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.015) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 1rem;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 4px 16px -4px rgba(0,0,0,0.4);
+  transition: transform .25s cubic-bezier(.4,.0,.2,1), border-color .25s, box-shadow .25s;
+}
+@media (hover: hover) {
+  .card-surface:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.12);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 12px 32px -10px rgba(0,0,0,0.55);
+  }
+}
+
 /* MapLibre dark popups override */
 .maplibregl-popup-content {
   background: rgba(11, 16, 32, 0.95) !important;
@@ -328,7 +368,23 @@
 .maplibregl-ctrl-group {
   background: rgba(11, 16, 32, 0.85) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
 }
 .maplibregl-ctrl-group button {
   filter: invert(1) brightness(1.5);
+}
+/* Bigger MapLibre controls on touch devices */
+@media (pointer: coarse) {
+  .maplibregl-ctrl-group button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+}
+/* Move attribution above mobile bottom nav */
+@media (max-width: 768px) {
+  .maplibregl-ctrl-bottom-right,
+  .maplibregl-ctrl-bottom-left {
+    bottom: 4.5rem !important;
+  }
 }
