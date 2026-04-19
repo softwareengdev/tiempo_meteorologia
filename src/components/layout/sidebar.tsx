@@ -42,10 +42,15 @@ export function Sidebar() {
       {/* Mobile backdrop */}
       <div
         onClick={() => useWeatherStore.getState().toggleSidebar()}
-        className="fixed inset-0 z-20 bg-black/50 backdrop-blur-sm md:hidden"
+        className="fixed inset-0 z-20 bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-200"
         aria-hidden="true"
       />
-      <aside className="fixed top-14 bottom-16 left-0 z-30 flex w-72 flex-col overflow-y-auto border-r border-white/10 bg-[#0b1020]/95 backdrop-blur-xl md:bottom-0 md:w-64">
+      <aside
+        className="fixed top-14 bottom-16 left-0 z-30 flex w-[85vw] max-w-[20rem] flex-col overflow-y-auto border-r border-white/10 bg-[#0b1020]/95 backdrop-blur-xl animate-in slide-in-from-left-4 duration-200 md:bottom-0 md:w-64 md:max-w-none"
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
+        role="complementary"
+        aria-label="Panel de capas y favoritos"
+      >
       {/* Model selector */}
       <div className="border-b border-white/5 p-4">
         <label className="mb-2 block text-xs font-semibold tracking-wider text-white/50 uppercase">

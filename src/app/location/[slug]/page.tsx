@@ -49,13 +49,18 @@ export default async function LocationPage({ params }: LocationPageProps) {
   }
 
   const location = locations[0];
-  const forecast = await getForecast({
-    latitude: location.latitude,
-    longitude: location.longitude,
-  });
+  let forecast: Awaited<ReturnType<typeof getForecast>> | null = null;
+  try {
+    forecast = await getForecast({
+      latitude: location.latitude,
+      longitude: location.longitude,
+    });
+  } catch {
+    forecast = null;
+  }
 
-  const current = forecast.current;
-  const daily = forecast.daily;
+  const current = forecast?.current;
+  const daily = forecast?.daily;
 
   return (
     <div className="min-h-screen bg-gray-950 px-4 py-8">
