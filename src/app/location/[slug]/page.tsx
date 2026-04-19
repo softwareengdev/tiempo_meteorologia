@@ -5,6 +5,23 @@ interface LocationPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  return [
+    { slug: 'madrid' },
+    { slug: 'barcelona' },
+    { slug: 'valencia' },
+    { slug: 'sevilla' },
+    { slug: 'zaragoza' },
+    { slug: 'malaga' },
+    { slug: 'bilbao' },
+    { slug: 'palma' },
+    { slug: 'las-palmas' },
+    { slug: 'murcia' },
+  ];
+}
+
 export async function generateMetadata({ params }: LocationPageProps): Promise<Metadata> {
   const { slug } = await params;
   const name = decodeURIComponent(slug).replace(/-/g, ' ');

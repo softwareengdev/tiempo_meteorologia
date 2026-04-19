@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next';
 import { SITE_URL, MAJOR_CITIES } from '@/lib/seo/constants';
 
+export const dynamic = 'force-static';
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
 
