@@ -160,39 +160,47 @@ export function useWeatherOverlay({ map, activeLayers }: WeatherOverlayProps) {
         const id = `weather-grid-${layer}`;
         const colors = LAYER_COLORS[layer];
         const [vmin, vmax] = RANGES[layer];
-        const features: GeoJSON.Feature[] = points.map((p, i) => ({
-          type: 'Feature',
-          geometry: { type: 'Point', coordinates: p },
-          properties: {
-            value: clamp01(((data[layer]?.[i] ?? NaN) - vmin) / (vmax - vmin)),
-            raw: data[layer]?.[i] ?? null,
-          },
-        }));
+        const features: GeoJSON.Feature[] = points.map((p, i) => {
+          const raw = data[layer]?.[i] ?? NaN;
+          return {
+            type: 'Feature',
+            geometry: { type: 'Point', coordinates: p },
+            properties: {
+              value: clamp01((raw - vmin) / (vmax - vmin)),
+              raw: Number.isFinite(raw) ? raw : null,
+            },
+          };
+        });
 
         const geo: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features };
         const src = map.getSource(id) as maplibregl.GeoJSONSource | undefined;
         if (src) {
           src.setData(geo);
-        } else {
-          map.addSource(id, { type: 'geojson', data: geo });
-          map.addLayer({
-            id,
-            type: 'circle',
-            source: id,
-            paint: {
-              'circle-radius': ['interpolate', ['linear'], ['zoom'], 3, 18, 6, 28, 10, 50, 14, 90],
-              'circle-color': ['interpolate', ['linear'], ['get', 'value'],
-                0, colors[0] || '#000',
-                0.25, colors[Math.max(1, Math.floor(colors.length * 0.25))] || colors[0],
-                0.5, colors[Math.floor(colors.length * 0.5)] || colors[0],
-                0.75, colors[Math.floor(colors.length * 0.75)] || colors[colors.length - 1],
-                1, colors[colors.length - 1],
-              ],
-              'circle-opacity': 0.55,
-              'circle-blur': 1.0,
-            },
-          });
+          continue;
         }
+
+        map.addSource(id, { type: 'geojson', data: geo });
+
+        // Interpolated heatmap (smooth, no visible grid dots)
+        // Build color ramp for heatmap-color expression: needs density 0 → transparent
+        const colorStops: unknown[] = ['interpolate', ['linear'], ['heatmap-density'], 0, 'rgba(0,0,0,0)'];
+        for (let k = 0; k < colors.length; k++) {
+          const stop = (k + 1) / colors.length;
+          colorStops.push(stop, colors[k]);
+        }
+
+        map.addLayer({
+          id,
+          type: 'heatmap',
+          source: id,
+          paint: {
+            'heatmap-weight': ['interpolate', ['linear'], ['get', 'value'], 0, 0, 1, 1],
+            'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 0.6, 4, 1.2, 9, 2.5, 14, 4],
+            'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 30, 4, 60, 6, 90, 9, 140, 14, 240],
+            'heatmap-color': colorStops as unknown as maplibregl.ExpressionSpecification,
+            'heatmap-opacity': 0.65,
+          },
+        });
       }
     };
 
