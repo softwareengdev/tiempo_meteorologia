@@ -83,7 +83,7 @@ export default async function LocationPage({ params }: LocationPageProps) {
   } : null;
 
   return (
-    <div className="min-h-screen bg-gray-950 px-4 py-8">
+    <div className="min-h-dvh bg-gray-950 px-4 py-8">
       <JsonLd data={breadcrumbLd} />
       {placeLd && <JsonLd data={placeLd} />}
 

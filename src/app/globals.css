@@ -307,6 +307,28 @@
 }
 
 /* ==========================================================================
+   Outdoor Mode — high-readability for outdoor / sunlight conditions
+   Activated by <html data-outdoor="1"> via OutdoorMode component.
+   Bumps base typography and contrast.
+   ========================================================================== */
+html[data-outdoor="1"] {
+  font-size: 19.5px;
+}
+html[data-outdoor="1"] body {
+  color: rgb(255 255 255 / 0.96);
+  -webkit-font-smoothing: antialiased;
+}
+html[data-outdoor="1"] .text-white\/30,
+html[data-outdoor="1"] .text-white\/40,
+html[data-outdoor="1"] .text-white\/50,
+html[data-outdoor="1"] .text-white\/55,
+html[data-outdoor="1"] .text-white\/60 { color: rgb(255 255 255 / 0.85); }
+html[data-outdoor="1"] .text-white\/70 { color: rgb(255 255 255 / 0.95); }
+html[data-outdoor="1"] .border-white\/5,
+html[data-outdoor="1"] .border-white\/10 { border-color: rgb(255 255 255 / 0.22); }
+html[data-outdoor="1"] [class*="bg-[#0b1020]"] { background-color: #050813; }
+
+/* ==========================================================================
    Mobile-first refinements
    ========================================================================== */
 @media (max-width: 640px) {

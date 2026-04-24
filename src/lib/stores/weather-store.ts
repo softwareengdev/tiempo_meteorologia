@@ -34,6 +34,12 @@ interface WeatherStore {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
   setSidebarOpen: (open: boolean) => void;
+
+  // Mobile UX
+  mobileTab: 'now' | 'today' | 'week' | 'detail';
+  setMobileTab: (t: 'now' | 'today' | 'week' | 'detail') => void;
+  outdoorMode: boolean;
+  toggleOutdoorMode: () => void;
 }
 
 export const useWeatherStore = create<WeatherStore>()(
@@ -101,6 +107,11 @@ export const useWeatherStore = create<WeatherStore>()(
       toggleSidebar: () =>
         set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
+
+      mobileTab: 'now',
+      setMobileTab: (t) => set({ mobileTab: t }),
+      outdoorMode: false,
+      toggleOutdoorMode: () => set((state) => ({ outdoorMode: !state.outdoorMode })),
     }),
     {
       name: 'aethercast-weather-store',
@@ -110,6 +121,8 @@ export const useWeatherStore = create<WeatherStore>()(
         activeLayers: state.activeLayers,
         selectedModel: state.selectedModel,
         favorites: state.favorites,
+        outdoorMode: state.outdoorMode,
+        mobileTab: state.mobileTab,
       }),
     },
   ),

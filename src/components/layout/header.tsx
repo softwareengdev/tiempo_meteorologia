@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { LocationSearch } from './location-search';
 import { ThemeToggle } from './theme-toggle';
+import { OutdoorMode } from './outdoor-mode';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
@@ -98,6 +99,7 @@ export function Header() {
         >
           <Star className={cn('h-4 w-4 transition-transform', isFav && 'fill-current scale-110')} />
         </motion.button>
+        <OutdoorMode />
         <ThemeToggle />
         <div className="hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 lg:flex">
           <span className="text-[11px] leading-none">📍</span>

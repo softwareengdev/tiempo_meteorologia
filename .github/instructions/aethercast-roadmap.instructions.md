@@ -11,6 +11,38 @@ description: "Roadmap de 6 fases para llevar AetherCast al nivel de las mejores 
 
 ---
 
+---
+
+## ✅ Fase 2 — Mobile-First Reconquista (COMPLETADA · 2026-04-24)
+
+| Cambio | Detalle |
+|--------|---------|
+| **Bottom-sheet (vaul)** | `WidgetPanel` con `Drawer.Root` (snap points `96px / 50% / 92%`), `modal={false}` para no bloquear el mapa, `dismissible={false}` (siempre presente), pull-to-refresh nativo (touch-only, 80px threshold → `qc.invalidateQueries(['weather','airQuality','marine'])`) |
+| **Tabs segmentados** | `SegmentedTabs<T>` reutilizable con pill animado (`motion.layoutId`), haptic `select`. 4 vistas: Ahora · Hoy · 7 días · Detalle. Filtra qué widgets se muestran |
+| **Hero móvil rediseñado** | `CurrentWeatherWidget` ahora con temperatura `text-7xl` (8xl en `sm:`), icono ilustrativo grande, glance-ribbon de 3 KPIs (prob. lluvia 6h / viento / humedad), `<details>` con métricas extendidas, skeleton loading |
+| **Outdoor Mode** | Botón en Header (`OutdoorMode`) que pone `data-outdoor="1"` en `<html>`. CSS sube font-size a 19.5px y bumpea contraste de todas las opacidades (`/30..70` → mayor opacidad, bordes más visibles). Diseño una sola vez, cascada global |
+| **Web Share + Haptic** | Hooks `useShare()` (Web Share API + clipboard fallback) y `useHaptic()` (Vibration API, respeta `prefers-reduced-motion`). Cableados al hero share button y a tabs/nav |
+| **Bottom-nav 4 ítems** | De 5 → 4 cols (Mapa · Panel · Pro · Más). Eliminado "Capas" (ya hay hamburger en Header). Touch target `min-h-[56px]`, indicador animado superior |
+| **Layout fullbleed mapa** | `app/page.tsx` reescrita: mapa absoluto + `<WidgetPanel />` flotante (drawer en mobile, aside derecho en `lg:`). 11 widgets eliminados del JSX inline |
+| **Persistencia store** | `mobileTab` y `outdoorMode` añadidos a Zustand con `persist` |
+| **`min-h-screen` → `min-h-dvh`** | Restante en `/location/[slug]` corregido |
+
+**Validaciones**:
+- `pnpm type-check` ✅
+- `pnpm lint` ✅ baseline preservada (4 errores pre-existentes; widget-panel usa el mismo patrón `eslint-disable-next-line react-hooks/set-state-in-effect`)
+- `pnpm build` ✅ 36 páginas, build OK
+- Edge DevTools MCP: drawer abre con peek inicial, tabs swap content, hero `21°` + share button + glance ribbon visibles, outdoor toggle activo en header, no errores nuevos en consola
+
+**Aprendizajes técnicos**:
+- vaul 1.1.2 `Drawer.Root` con `modal={false}` + `dismissible={false}` + `open` controlado: montar `open=true` en `useEffect` evita SSR mismatch. Necesita `Drawer.Title`/`Description` (sr-only OK) para a11y
+- vaul `snapPoints` acepta strings (`'96px'`) y números 0..1 (vh fraction). Mezclar es válido
+- `qc.invalidateQueries({ queryKey: ['weather'] })` invalida por prefijo (todas las variantes con args extras)
+- Pull-to-refresh: bastan `touchstart`/`touchmove` con guard `scrollTop <= 0` y umbral 80px. Sin libs ni overscroll API
+- Outdoor mode: usar atributo en `<html>` + selectores `html[data-outdoor="1"] .text-white\/30 { ... }` cubre todo el cascade sin tocar componentes
+- Web Share API solo está en HTTPS o localhost; en desktop falla silente → fallback a clipboard
+
+---
+
 ## ✅ Fase 1 — Estabilización (COMPLETADA · 2026-04-24)
 
 | Error | Estado | Fix aplicado |
