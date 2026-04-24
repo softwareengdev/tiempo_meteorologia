@@ -5,13 +5,14 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   Line,
 } from 'recharts';
-import { useWeatherForecast } from '@/lib/hooks';
+import { useWeatherForecast, useMounted } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
 
 export function MeteogramWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
   const locationName = useWeatherStore((s) => s.locationName);
   const { data, isLoading } = useWeatherForecast(selectedLocation);
+  const mounted = useMounted();
 
   if (isLoading || !data?.hourly) {
     return (
@@ -49,7 +50,8 @@ export function MeteogramWidget() {
       </div>
 
       <div className="h-72">
-        <ResponsiveContainer width="100%" height="100%">
+        {mounted && (
+        <ResponsiveContainer width="100%" height={288}>
           <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="meteogramTemp" x1="0" y1="0" x2="0" y2="1">
@@ -83,6 +85,7 @@ export function MeteogramWidget() {
             <Line type="monotone" dataKey="wind" stroke="#22d3ee" strokeWidth={1} dot={false} name="Viento km/h" strokeDasharray="4 4" />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </div>
 
       <div className="mt-3 flex items-center justify-center gap-4 text-xs text-white/40">

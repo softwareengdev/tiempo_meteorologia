@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Moon } from 'lucide-react';
 import { useMemo } from 'react';
 import { useWeatherStore } from '@/lib/stores';
+import { useMounted } from '@/lib/hooks';
 
 function getMoonPhase(date: Date) {
   const synodic = 29.530588853;
@@ -57,7 +58,13 @@ function MoonSVG({ illumination, waxing }: { illumination: number; waxing: boole
 
 export function AstronomyWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
-  const moon = useMemo(() => getMoonPhase(new Date()), []);
+  const mounted = useMounted();
+  // Use a stable reference date during SSR/hydration; only switch to "now"
+  // after mount to avoid hydration mismatches in the Moon SVG.
+  const moon = useMemo(
+    () => getMoonPhase(mounted ? new Date() : new Date('2026-04-24T00:00:00Z')),
+    [mounted],
+  );
   const waxing = moon.fraction < 0.5;
 
   if (!selectedLocation) return null;

@@ -6,10 +6,12 @@ import {
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 import { useWeatherStore } from '@/lib/stores';
+import { useMounted } from '@/lib/hooks';
 import { TrendingUp } from 'lucide-react';
 
 export function ClimateHistoryWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
+  const mounted = useMounted();
 
   const { data: historyData, isLoading } = useQuery({
     queryKey: ['climate-history', selectedLocation?.latitude, selectedLocation?.longitude],
@@ -70,7 +72,8 @@ export function ClimateHistoryWidget() {
       </div>
 
       <div className="h-48">
-        <ResponsiveContainer width="100%" height="100%">
+        {mounted && (
+        <ResponsiveContainer width="100%" height={192}>
           <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="date" stroke="rgba(255,255,255,0.15)" fontSize={8} tickLine={false} interval={4} />
@@ -89,6 +92,7 @@ export function ClimateHistoryWidget() {
             <Line type="monotone" dataKey="precip" stroke="#22d3ee" strokeWidth={1} dot={false} name="Precip mm" strokeDasharray="4 4" />
           </LineChart>
         </ResponsiveContainer>
+        )}
       </div>
 
       <div className="mt-2 flex items-center justify-center gap-4 text-xs text-white/30">

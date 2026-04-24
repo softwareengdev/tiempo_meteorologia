@@ -4,13 +4,14 @@ import { motion } from 'framer-motion';
 import {
   RadialBarChart, RadialBar, ResponsiveContainer, PolarAngleAxis,
 } from 'recharts';
-import { useWeatherForecast } from '@/lib/hooks';
+import { useWeatherForecast, useMounted } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
 import { Droplets } from 'lucide-react';
 
 export function HumidityWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
   const { data, isLoading } = useWeatherForecast(selectedLocation);
+  const mounted = useMounted();
 
   if (isLoading || !data?.current) return null;
 
@@ -31,7 +32,8 @@ export function HumidityWidget() {
 
       <div className="flex items-center gap-4">
         <div className="h-24 w-24">
-          <ResponsiveContainer width="100%" height="100%">
+          {mounted && (
+          <ResponsiveContainer width={96} height={96}>
             <RadialBarChart
               innerRadius="70%"
               outerRadius="100%"
@@ -43,6 +45,7 @@ export function HumidityWidget() {
               <RadialBar dataKey="value" cornerRadius={10} background={{ fill: 'rgba(255,255,255,0.05)' }} />
             </RadialBarChart>
           </ResponsiveContainer>
+          )}
         </div>
         <div>
           <p className="text-3xl font-light text-white">{humidity}%</p>

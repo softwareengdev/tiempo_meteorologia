@@ -4,12 +4,13 @@ import { motion } from 'framer-motion';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
 } from 'recharts';
-import { useWeatherForecast } from '@/lib/hooks';
+import { useWeatherForecast, useMounted } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
 
 export function HourlyChartWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
   const { data, isLoading } = useWeatherForecast(selectedLocation);
+  const mounted = useMounted();
 
   if (isLoading || !data?.hourly) {
     return (
@@ -40,7 +41,8 @@ export function HourlyChartWidget() {
       </h3>
 
       <div className="h-56">
-        <ResponsiveContainer width="100%" height="100%">
+        {mounted && (
+        <ResponsiveContainer width="100%" height={224}>
           <AreaChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
@@ -101,6 +103,7 @@ export function HourlyChartWidget() {
             />
           </AreaChart>
         </ResponsiveContainer>
+        )}
       </div>
     </motion.div>
   );

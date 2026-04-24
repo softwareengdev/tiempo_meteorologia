@@ -36,8 +36,9 @@ export function MobileBottomNav() {
             href={item.href}
             aria-current={active ? 'page' : undefined}
             aria-label={item.label}
+            prefetch={false}
             className={cn(
-              'relative flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] transition-colors',
+              'relative flex min-h-[48px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] transition-colors',
               active ? 'text-sky-300' : 'text-white/55 active:text-white',
             )}
           >
@@ -61,7 +62,7 @@ export function MobileBottomNav() {
       })}
       <button
         onClick={toggleSidebar}
-        className="flex h-12 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] text-white/55 transition-colors active:text-white"
+        className="flex min-h-[48px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] text-white/55 transition-colors active:text-white"
         aria-label="Buscar y filtros de capas"
       >
         <Search className="h-5 w-5" strokeWidth={1.8} />

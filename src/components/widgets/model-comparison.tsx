@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { useQuery } from '@tanstack/react-query';
 import { useWeatherStore } from '@/lib/stores';
+import { useMounted } from '@/lib/hooks';
 import { Activity } from 'lucide-react';
 
 const MODELS = [
@@ -29,6 +30,7 @@ export function ModelComparisonWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
   const [metric, setMetric] = useState<CompareMetric>('temperature_2m');
   const [activeModels, setActiveModels] = useState<string[]>(['ecmwf_ifs025', 'icon_global', 'gfs_global']);
+  const mounted = useMounted();
 
   const { data: modelData, isLoading } = useQuery({
     queryKey: ['model-comparison', selectedLocation?.latitude, selectedLocation?.longitude, activeModels.join(',')],
@@ -139,12 +141,12 @@ export function ModelComparisonWidget() {
 
       {/* Chart */}
       <div className="h-64">
-        {isLoading ? (
+        {isLoading || !mounted ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-sm text-white/30">Cargando modelos...</p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height={256}>
             <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="time" stroke="rgba(255,255,255,0.15)" fontSize={8} tickLine={false} interval={11} />

@@ -1,5 +1,8 @@
 import { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getForecast, searchLocations, getWeatherDescription, getWeatherIcon } from '@/lib/weather';
+import { MAJOR_CITIES, SITE_URL, SITE_NAME, JsonLd } from '@/lib/seo';
 
 interface LocationPageProps {
   params: Promise<{ slug: string }>;
@@ -8,47 +11,44 @@ interface LocationPageProps {
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return [
-    { slug: 'madrid' },
-    { slug: 'barcelona' },
-    { slug: 'valencia' },
-    { slug: 'sevilla' },
-    { slug: 'zaragoza' },
-    { slug: 'malaga' },
-    { slug: 'bilbao' },
-    { slug: 'palma' },
-    { slug: 'las-palmas' },
-    { slug: 'murcia' },
-  ];
+  return MAJOR_CITIES.map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: LocationPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const name = decodeURIComponent(slug).replace(/-/g, ' ');
+  const city = MAJOR_CITIES.find((c) => c.slug === slug);
+  const name = city?.name ?? decodeURIComponent(slug).replace(/-/g, ' ');
+  const country = city?.country ? `, ${city.country}` : '';
+  const title = `Tiempo en ${name}${country} — Pronóstico 7 días | ${SITE_NAME}`;
+  const description = `El tiempo en ${name}${country} hoy y los próximos 7 días: temperatura, lluvia, viento, presión, humedad y radar en directo. Multi-modelo (ECMWF, ICON, GFS).`;
+  const url = `${SITE_URL}/location/${slug}`;
   return {
-    title: `Tiempo en ${name} — AetherCast`,
-    description: `Pronóstico meteorológico detallado para ${name}. Temperatura, viento, precipitación y más.`,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, type: 'website', siteName: SITE_NAME, locale: 'es_ES' },
+    twitter: { card: 'summary_large_image', title, description },
   };
 }
 
 export default async function LocationPage({ params }: LocationPageProps) {
   const { slug } = await params;
-  const name = decodeURIComponent(slug).replace(/-/g, ' ');
+  const city = MAJOR_CITIES.find((c) => c.slug === slug);
+  const queryName = city?.name ?? decodeURIComponent(slug).replace(/-/g, ' ');
 
-  const locations = await searchLocations(name);
-  if (!locations.length) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-950">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-white">Ubicación no encontrada</h1>
-          <p className="mt-2 text-white/60">No se encontraron resultados para &quot;{name}&quot;</p>
-          <a href="/" className="mt-4 inline-block text-sky-400 hover:underline">← Volver al mapa</a>
-        </div>
-      </div>
-    );
+  const locations = await searchLocations(queryName);
+  if (!locations.length && !city) {
+    notFound();
   }
 
-  const location = locations[0];
+  const location = locations[0] ?? {
+    name: city!.name,
+    country: city!.country,
+    latitude: city!.latitude,
+    longitude: city!.longitude,
+    admin1: undefined,
+    elevation: undefined,
+  };
   let forecast: Awaited<ReturnType<typeof getForecast>> | null = null;
   try {
     forecast = await getForecast({
@@ -61,22 +61,58 @@ export default async function LocationPage({ params }: LocationPageProps) {
 
   const current = forecast?.current;
   const daily = forecast?.daily;
+  const cityName = city?.name ?? location.name;
+  const countryName = city?.country ?? location.country;
+
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Tiempo por ciudades', item: `${SITE_URL}/#ciudades` },
+      { '@type': 'ListItem', position: 3, name: cityName, item: `${SITE_URL}/location/${slug}` },
+    ],
+  };
+
+  const placeLd = current ? {
+    '@context': 'https://schema.org',
+    '@type': 'Place',
+    name: cityName,
+    address: { '@type': 'PostalAddress', addressLocality: cityName, addressCountry: countryName },
+    geo: { '@type': 'GeoCoordinates', latitude: location.latitude, longitude: location.longitude },
+  } : null;
 
   return (
     <div className="min-h-screen bg-gray-950 px-4 py-8">
+      <JsonLd data={breadcrumbLd} />
+      {placeLd && <JsonLd data={placeLd} />}
+
       <div className="mx-auto max-w-4xl">
-        <a href="/" className="mb-6 inline-block text-sm text-sky-400 hover:underline">
+        <nav aria-label="Migas de pan" className="mb-4 text-xs text-white/50">
+          <Link href="/" className="hover:text-sky-400">Inicio</Link>
+          <span className="mx-2 text-white/20">/</span>
+          <Link href="/#ciudades" className="hover:text-sky-400">Ciudades</Link>
+          <span className="mx-2 text-white/20">/</span>
+          <span className="text-white/70">{cityName}</span>
+        </nav>
+
+        <Link href="/" className="mb-6 inline-block text-sm text-sky-400 hover:underline">
           ← Volver al mapa
-        </a>
+        </Link>
 
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">
-            {location.name}
-            {location.admin1 && <span className="text-white/50">, {location.admin1}</span>}
+          <h1 className="text-3xl font-bold text-white sm:text-4xl">
+            Tiempo en {cityName}
+            {countryName && <span className="text-white/50">, {countryName}</span>}
           </h1>
           <p className="mt-1 text-sm text-white/40">
-            {location.country} · {location.latitude.toFixed(4)}°N, {location.longitude.toFixed(4)}°{location.longitude >= 0 ? 'E' : 'O'}
-            {location.elevation && ` · ${location.elevation}m`}
+            {location.latitude.toFixed(4)}°N, {location.longitude.toFixed(4)}°{location.longitude >= 0 ? 'E' : 'O'}
+            {location.elevation && ` · ${location.elevation}m de altitud`}
+          </p>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/60">
+            Pronóstico meteorológico actualizado para {cityName}{countryName && `, ${countryName}`}: temperatura,
+            precipitación, viento, presión y humedad para hoy y los próximos 7 días, con datos de los modelos ECMWF,
+            ICON y GFS vía Open-Meteo.
           </p>
         </div>
 
@@ -84,7 +120,7 @@ export default async function LocationPage({ params }: LocationPageProps) {
           <div className="mb-8 rounded-2xl border border-white/10 bg-gradient-to-br from-sky-500/10 to-blue-600/5 p-8">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-white/50">Ahora</p>
+                <p className="text-sm text-white/50">Ahora en {cityName}</p>
                 <div className="flex items-end gap-2">
                   <span className="text-6xl font-light text-white">
                     {Math.round(current.temperature_2m)}°
@@ -96,7 +132,7 @@ export default async function LocationPage({ params }: LocationPageProps) {
                   Sensación: {Math.round(current.apparent_temperature)}°C
                 </p>
               </div>
-              <span className="text-7xl">{getWeatherIcon(current.weather_code, current.is_day === 1)}</span>
+              <span className="text-7xl" aria-hidden="true">{getWeatherIcon(current.weather_code, current.is_day === 1)}</span>
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -109,8 +145,10 @@ export default async function LocationPage({ params }: LocationPageProps) {
         )}
 
         {daily && (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">Pronóstico 7 Días</h2>
+          <section className="rounded-2xl border border-white/10 bg-white/5 p-6" aria-labelledby="forecast-7d">
+            <h2 id="forecast-7d" className="mb-4 text-lg font-semibold text-white">
+              Pronóstico 7 días en {cityName}
+            </h2>
             <div className="space-y-3">
               {daily.time.map((day, i) => {
                 const date = new Date(day);
@@ -119,12 +157,14 @@ export default async function LocationPage({ params }: LocationPageProps) {
                     <span className="w-20 text-sm font-medium capitalize text-white/70">
                       {i === 0 ? 'Hoy' : date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' })}
                     </span>
-                    <span className="text-2xl">{getWeatherIcon(daily.weather_code[i], true)}</span>
+                    <span className="text-2xl" aria-hidden="true">{getWeatherIcon(daily.weather_code[i], true)}</span>
                     <span className="flex-1 text-sm text-white/50">
                       {getWeatherDescription(daily.weather_code[i])}
                     </span>
                     {daily.precipitation_probability_max[i] > 0 && (
-                      <span className="text-xs text-sky-400">💧 {daily.precipitation_probability_max[i]}%</span>
+                      <span className="text-xs text-sky-400" aria-label={`Probabilidad de lluvia ${daily.precipitation_probability_max[i]}%`}>
+                        💧 {daily.precipitation_probability_max[i]}%
+                      </span>
                     )}
                     <div className="text-right">
                       <span className="text-lg font-medium text-white">{Math.round(daily.temperature_2m_max[i])}°</span>
@@ -134,8 +174,23 @@ export default async function LocationPage({ params }: LocationPageProps) {
                 );
               })}
             </div>
-          </div>
+          </section>
         )}
+
+        <section className="mt-10" aria-labelledby="other-cities">
+          <h2 id="other-cities" className="mb-4 text-lg font-semibold text-white">Otras ciudades</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4">
+            {MAJOR_CITIES.filter((c) => c.slug !== slug).slice(0, 12).map((c) => (
+              <Link
+                key={c.slug}
+                href={`/location/${c.slug}`}
+                className="rounded-lg border border-white/5 bg-white/[0.02] px-3 py-2 text-sm text-white/70 transition hover:border-sky-400/30 hover:bg-white/5 hover:text-white"
+              >
+                Tiempo en {c.name}
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

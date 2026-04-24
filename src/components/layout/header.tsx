@@ -32,16 +32,16 @@ export function Header() {
         <motion.button
           whileTap={{ scale: 0.92 }}
           onClick={toggleSidebar}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
           aria-label={sidebarOpen ? 'Cerrar menú lateral' : 'Abrir menú lateral'}
         >
           {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </motion.button>
-        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="AetherCast inicio">
+        <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="AetherCast inicio" prefetch={false}>
           <Cloud className="h-6 w-6 text-sky-400 drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]" />
-          <h1 className="bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-base font-bold text-transparent sm:text-lg">
+          <span className="bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-base font-bold text-transparent sm:text-lg">
             AetherCast
-          </h1>
+          </span>
         </Link>
 
         <nav className="ml-2 hidden items-center gap-1 md:flex" aria-label="Navegación principal">
@@ -57,8 +57,9 @@ export function Header() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? 'page' : undefined}
+                prefetch={false}
                 className={cn(
-                  'relative flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors',
+                  'relative flex min-h-[44px] items-center gap-1.5 rounded-lg px-3 py-2 text-sm transition-colors',
                   active
                     ? item.accent
                       ? 'bg-purple-500/20 text-purple-300'
@@ -91,7 +92,7 @@ export function Header() {
           onClick={toggleFav}
           aria-label={isFav ? 'Quitar de favoritos' : 'Guardar en favoritos'}
           className={cn(
-            'flex h-9 w-9 items-center justify-center rounded-lg transition-colors',
+            'flex h-11 w-11 items-center justify-center rounded-lg transition-colors',
             isFav ? 'text-amber-400 hover:bg-amber-400/10' : 'text-white/50 hover:bg-white/10 hover:text-white',
           )}
         >

@@ -5,12 +5,13 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line,
 } from 'recharts';
-import { useWeatherForecast } from '@/lib/hooks';
+import { useWeatherForecast, useMounted } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
 
 export function WindChartWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
   const { data, isLoading } = useWeatherForecast(selectedLocation);
+  const mounted = useMounted();
 
   if (isLoading || !data?.hourly) return null;
 
@@ -31,7 +32,8 @@ export function WindChartWidget() {
         Viento y Rachas — 48h
       </h3>
       <div className="h-40">
-        <ResponsiveContainer width="100%" height="100%">
+        {mounted && (
+        <ResponsiveContainer width="100%" height={160}>
           <BarChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} interval={5} />
@@ -49,6 +51,7 @@ export function WindChartWidget() {
             <Bar dataKey="gusts" fill="#6366f1" radius={[2, 2, 0, 0]} name="Rachas (km/h)" opacity={0.5} />
           </BarChart>
         </ResponsiveContainer>
+        )}
       </div>
     </motion.div>
   );
@@ -57,6 +60,7 @@ export function WindChartWidget() {
 export function PressureChartWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
   const { data, isLoading } = useWeatherForecast(selectedLocation);
+  const mounted = useMounted();
 
   if (isLoading || !data?.hourly) return null;
 
@@ -76,7 +80,8 @@ export function PressureChartWidget() {
         Presión Atmosférica — 48h
       </h3>
       <div className="h-36">
-        <ResponsiveContainer width="100%" height="100%">
+        {mounted && (
+        <ResponsiveContainer width="100%" height={144}>
           <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
             <XAxis dataKey="time" stroke="rgba(255,255,255,0.2)" fontSize={9} tickLine={false} interval={5} />
@@ -93,6 +98,7 @@ export function PressureChartWidget() {
             <Line type="monotone" dataKey="pressure" stroke="#a78bfa" strokeWidth={2} dot={false} name="hPa" />
           </LineChart>
         </ResponsiveContainer>
+        )}
       </div>
     </motion.div>
   );
