@@ -5,7 +5,7 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useTheme } from 'next-themes';
 import { useWeatherStore } from '@/lib/stores';
-import { useWeatherOverlay } from './weather-overlay';
+import { useWeatherOverlay, type WindGridSample } from './weather-overlay';
 import { MapLegend } from './map-legend';
 import { TimeSlider } from './time-slider';
 import { WindParticles } from './wind-particles';
@@ -18,11 +18,12 @@ export function WeatherMap() {
   const mapRef = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
   const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null);
+  const [windGrid, setWindGrid] = useState<WindGridSample[] | null>(null);
   const { resolvedTheme } = useTheme();
   const { mapView, setMapView, selectedLocation, setSelectedLocation, locationName, activeLayers } =
     useWeatherStore();
 
-  useWeatherOverlay({ map: mapInstance, activeLayers });
+  useWeatherOverlay({ map: mapInstance, activeLayers, onWindGrid: setWindGrid });
 
   const styleUrl = resolvedTheme === 'light' ? MAP_STYLE_LIGHT : MAP_STYLE_DARK;
 
@@ -37,6 +38,14 @@ export function WeatherMap() {
       pitch: mapView.pitch || 0,
       bearing: mapView.bearing || 0,
       attributionControl: false,
+      cooperativeGestures: false,
+      scrollZoom: true,
+      keyboard: true,
+      doubleClickZoom: true,
+      touchZoomRotate: true,
+      dragRotate: true,
+      maxZoom: 18,
+      minZoom: 1.5,
     });
     mapRef.current = m;
 
@@ -114,10 +123,10 @@ export function WeatherMap() {
   return (
     <div className="relative h-full w-full">
       <div ref={mapContainer} className="h-full w-full" />
-      <WindParticles map={mapInstance} />
+      <WindParticles map={mapInstance} grid={windGrid} />
       <MapLegend />
       <TimeSlider />
-      <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
+      <div className="pointer-events-none absolute top-[4.5rem] left-1/2 z-10 -translate-x-1/2">
         <div className="pointer-events-auto rounded-full border border-white/10 bg-[#0b1020]/85 px-4 py-1.5 backdrop-blur-md shadow-lg">
           <p className="text-[13px] font-medium text-white/80">
             📍 {locationName}

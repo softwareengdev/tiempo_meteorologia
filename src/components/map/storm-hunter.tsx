@@ -27,7 +27,7 @@ export function StormHunter() {
         aria-label={active ? 'Desactivar modo Caza-tormentas' : 'Activar modo Caza-tormentas'}
         title="Modo Caza-tormentas (CAPE + rachas + precipitación)"
         className={cn(
-          'absolute top-20 right-4 z-20 flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-md transition-colors lg:top-4 lg:right-[26rem]',
+          'absolute top-20 right-4 z-20 flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-md transition-colors lg:top-[4.5rem] lg:right-[26rem]',
           active
             ? 'border-violet-400/60 bg-gradient-to-r from-indigo-500/30 to-violet-500/30 text-white shadow-[0_0_20px_rgba(139,92,246,0.45)]'
             : 'border-white/10 bg-[#0b1020]/70 text-white/70 hover:bg-[#0b1020]/90 hover:text-white',
@@ -50,7 +50,7 @@ export function StormHunter() {
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: -20, opacity: 0 }}
-            className="pointer-events-none absolute top-4 left-1/2 z-20 -translate-x-1/2 rounded-full border border-violet-400/40 bg-gradient-to-r from-indigo-600/85 to-violet-600/85 px-4 py-1.5 text-xs font-medium text-white shadow-lg backdrop-blur-md"
+            className="pointer-events-none absolute top-[4.5rem] left-1/2 z-20 -translate-x-1/2 rounded-full border border-violet-400/40 bg-gradient-to-r from-indigo-600/85 to-violet-600/85 px-4 py-1.5 text-xs font-medium text-white shadow-lg backdrop-blur-md"
             role="status"
           >
             ⚡ Modo Caza-tormentas activo · CAPE + rachas + precipitación

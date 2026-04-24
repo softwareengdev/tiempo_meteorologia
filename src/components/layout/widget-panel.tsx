@@ -178,7 +178,7 @@ export function WidgetPanel() {
       {isDesktop && (
       <aside
         aria-label="Información meteorológica"
-        className="absolute top-4 right-4 z-20 flex max-h-[calc(100dvh-5rem)] w-96 flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b1020]/65 p-3 backdrop-blur-md"
+        className="absolute top-[4.5rem] right-4 z-20 flex max-h-[calc(100dvh-7rem)] w-96 flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b1020]/65 p-3 backdrop-blur-md shadow-2xl"
       >
         <SegmentedTabs<Tab>
           ariaLabel="Secciones meteorológicas escritorio"

@@ -1,6 +1,23 @@
 import type { Coordinates, WeatherResponse, GeocodingResult } from '@/types';
 
 const OPEN_METEO_BASE = process.env.NEXT_PUBLIC_OPEN_METEO_BASE || 'https://api.open-meteo.com';
+/** Cloudflare Pages Function that proxies + caches Open-Meteo. Local dev returns 404 → we fallback. */
+const PROXY_BASE = '/api/wx/grid';
+
+/** Prefer same-origin proxy (single egress IP, edge cache, no per-user 429). Fallback to direct. */
+async function fetchOpenMeteoForecast(params: URLSearchParams): Promise<Response> {
+  if (typeof window !== 'undefined') {
+    try {
+      const proxied = await fetch(`${PROXY_BASE}?${params}`);
+      if (proxied.ok) return proxied;
+      // 404 = proxy not deployed (local dev); anything else retryable falls through
+      if (proxied.status !== 404) return proxied;
+    } catch {
+      // network error → fallback
+    }
+  }
+  return fetch(`${OPEN_METEO_BASE}/v1/forecast?${params}`);
+}
 
 const CURRENT_PARAMS = [
   'temperature_2m', 'relative_humidity_2m', 'apparent_temperature',
@@ -46,9 +63,7 @@ export async function getForecast(
     params.set('models', model);
   }
 
-  const res = await fetch(`${OPEN_METEO_BASE}/v1/forecast?${params}`, {
-    next: { revalidate: 300 },
-  });
+  const res = await fetchOpenMeteoForecast(params);
 
   if (!res.ok) {
     throw new Error(`Weather API error: ${res.status}`);
@@ -71,9 +86,7 @@ export async function getMultiModelForecast(
     models: 'ecmwf_ifs025,icon_global,gfs_global',
   });
 
-  const res = await fetch(`${OPEN_METEO_BASE}/v1/forecast?${params}`, {
-    next: { revalidate: 300 },
-  });
+  const res = await fetchOpenMeteoForecast(params);
 
   if (!res.ok) {
     throw new Error(`Multi-model API error: ${res.status}`);

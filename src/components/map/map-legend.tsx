@@ -7,11 +7,11 @@ import type { WeatherLayer } from '@/types';
 
 const LABELS: Record<WeatherLayer, { name: string; min: string; max: string }> = {
   temperature: { name: 'Temperatura', min: '-30°C', max: '45°C' },
-  precipitation: { name: 'Precipitación', min: '0', max: '30 mm' },
-  rain: { name: 'Lluvia', min: '0', max: '30 mm' },
-  snow: { name: 'Nieve', min: '0', max: '200 cm' },
-  snowfall: { name: 'Nevada', min: '0', max: '30 cm' },
-  wind: { name: 'Viento', min: '0', max: '35 m/s' },
+  precipitation: { name: 'Precipitación', min: '0', max: '15 mm' },
+  rain: { name: 'Lluvia', min: '0', max: '15 mm' },
+  snow: { name: 'Nieve', min: '0', max: '5 cm' },
+  snowfall: { name: 'Nevada', min: '0', max: '5 cm' },
+  wind: { name: 'Viento', min: '0', max: '30 m/s' },
   wind_gusts: { name: 'Rachas', min: '0', max: '50 m/s' },
   clouds: { name: 'Nubes', min: '0%', max: '100%' },
   pressure: { name: 'Presión', min: '970', max: '1040 hPa' },
