@@ -160,6 +160,26 @@
   /* Safe area insets for mobile */
   --safe-top: env(safe-area-inset-top);
   --safe-bottom: env(safe-area-inset-bottom);
+
+  /* WMO scientific palettes — temperatura, viento Beaufort, precipitación */
+  --wmo-temp-frigid:  #2a4a8b;
+  --wmo-temp-cold:    #4f8fd9;
+  --wmo-temp-cool:    #7ec8a9;
+  --wmo-temp-mild:    #d4d97c;
+  --wmo-temp-warm:    #f0a868;
+  --wmo-temp-hot:     #d9534f;
+  --wmo-temp-extreme: #8b1b3a;
+  --wmo-wind-calm:    #a7d9d4;
+  --wmo-wind-light:   #6ec3bd;
+  --wmo-wind-moderate:#3b9ea1;
+  --wmo-wind-strong:  #d97706;
+  --wmo-wind-gale:    #b91c1c;
+  --wmo-wind-storm:   #5b21b6;
+  --wmo-precip-trace: #cfe9ff;
+  --wmo-precip-light: #7cc4ff;
+  --wmo-precip-moderate: #2f72ff;
+  --wmo-precip-heavy: #1a3389;
+  --wmo-precip-extreme: #6b21a8;
 }
 
 @layer base {
@@ -303,6 +323,25 @@
     background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
+  }
+
+  /* WeatherIcon animations */
+  @keyframes wi-spin   { to { transform: rotate(360deg); } }
+  @keyframes wi-fall   { 0% { transform: translateY(-12px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(8px); opacity: 0; } }
+  @keyframes wi-snow   { 0% { transform: translateY(-12px) rotate(0deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(10px) rotate(180deg); opacity: 0; } }
+  @keyframes wi-flash  { 0%, 60%, 100% { opacity: 1; } 65%, 80% { opacity: 0.15; } 70%, 90% { opacity: 1; } }
+
+  /* Aether brand loading ring */
+  @keyframes aether-ring  { to { transform: rotate(360deg); } }
+  @keyframes aether-pulse { 0%, 100% { opacity: 0.6; transform: scale(0.96); } 50% { opacity: 1; transform: scale(1.04); } }
+
+  /* Aurora gradient morph (uses CSS var --aurora-from / --aurora-to set at runtime) */
+  .bg-aurora-dynamic {
+    background:
+      radial-gradient(circle at 20% 10%, var(--aurora-glow, rgba(47,114,255,0.18)) 0%, transparent 55%),
+      radial-gradient(circle at 80% 90%, var(--aurora-accent, rgba(107,92,255,0.16)) 0%, transparent 55%),
+      linear-gradient(160deg, var(--aurora-from, #0b1020) 0%, var(--aurora-to, #142053) 100%);
+    transition: background 1500ms ease;
   }
 }
 

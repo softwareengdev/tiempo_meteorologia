@@ -8,7 +8,7 @@ import {
 import { useEffect, useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useWeatherStore } from '@/lib/stores';
-import { useHaptic } from '@/lib/hooks';
+import { useHaptic, useMediaQuery } from '@/lib/hooks';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import {
   CurrentWeatherWidget, AlertsWidget, AirQualityWidget, SunriseSunsetWidget,
@@ -75,6 +75,7 @@ export function WidgetPanel() {
   const setTab = useWeatherStore((s) => s.setMobileTab);
   const haptic = useHaptic();
   const qc = useQueryClient();
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   const [snap, setSnap] = useState<number | string | null>(SNAP_POINTS[1]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -113,8 +114,8 @@ export function WidgetPanel() {
 
   return (
     <>
-      {/* Mobile: vaul Drawer */}
-      <div className="lg:hidden">
+      {/* Mobile: vaul Drawer (gated with JS to avoid Portal escaping CSS hide rules) */}
+      {!isDesktop && (
         <Drawer.Root
           open={open}
           modal={false}
@@ -165,12 +166,13 @@ export function WidgetPanel() {
             </Drawer.Content>
           </Drawer.Portal>
         </Drawer.Root>
-      </div>
+      )}
 
       {/* Desktop: static right-side floating panel */}
+      {isDesktop && (
       <aside
         aria-label="Información meteorológica"
-        className="absolute top-4 right-4 z-20 hidden max-h-[calc(100dvh-5rem)] w-96 flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b1020]/65 p-3 backdrop-blur-md lg:flex"
+        className="absolute top-4 right-4 z-20 flex max-h-[calc(100dvh-5rem)] w-96 flex-col gap-3 overflow-y-auto rounded-2xl border border-white/10 bg-[#0b1020]/65 p-3 backdrop-blur-md"
       >
         <SegmentedTabs<Tab>
           ariaLabel="Secciones meteorológicas escritorio"
@@ -180,6 +182,7 @@ export function WidgetPanel() {
         />
         <PanelContent tab={tab} />
       </aside>
+      )}
     </>
   );
 }

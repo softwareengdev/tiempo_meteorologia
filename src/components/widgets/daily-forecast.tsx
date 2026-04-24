@@ -3,7 +3,8 @@
 import { motion } from 'framer-motion';
 import { useWeatherForecast } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
-import { getWeatherIcon, getWeatherDescription } from '@/lib/weather';
+import { getWeatherDescription } from '@/lib/weather';
+import { WeatherIcon } from '@/components/icons';
 
 export function DailyForecastWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
@@ -51,9 +52,7 @@ export function DailyForecastWidget() {
               <span className="w-10 text-sm font-medium capitalize text-white/70">
                 {dayName}
               </span>
-              <span className="text-xl">
-                {getWeatherIcon(daily.weather_code[i], true)}
-              </span>
+              <WeatherIcon code={daily.weather_code[i]} isDay={true} size={28} animated={isToday} />
               <span className="flex-1 text-xs text-white/40">
                 {getWeatherDescription(daily.weather_code[i])}
               </span>

@@ -13,7 +13,34 @@ description: "Roadmap de 6 fases para llevar AetherCast al nivel de las mejores 
 
 ---
 
-## ✅ Fase 2 — Mobile-First Reconquista (COMPLETADA · 2026-04-24)
+## ✅ Fase 3 — UI/UX Polish & Branding (COMPLETADA · 2026-04-24)
+
+| Cambio | Detalle |
+|--------|---------|
+| **WeatherIcon SVG animado** | Componente `<WeatherIcon code isDay size animated />` con 12 _kinds_ (clear, mostlyClear, partlyCloudy, cloudy, fog, drizzle, rain, heavyRain, freezingRain, snow, sleet, thunderstorm). Día/noche (Sun/Moon). Animaciones SMIL+CSS: sol gira (`wi-spin 22s`), gotas caen (`wi-fall`), copos rotan (`wi-snow`), rayo parpadea (`wi-flash`). Memoized. Reemplaza emoji `getWeatherIcon` en `current-weather`, `daily-forecast`, `hourly-detail`, `location/[slug]` |
+| **AuroraBackground dinámico** | Gradiente reactivo a `weather_code` + `is_day` vía CSS vars (`--aurora-from/to/glow/accent`) con transición 1500ms. 8 paletas (clear día/noche, partly, cloudy, fog, rain, snow, storm). Cableado en `app/page.tsx` detrás del mapa |
+| **SunArc widget** | Rewrite total de `sunrise-sunset.tsx`: arco SVG (240×100, half-circle 20,90→220,90, apex 120,20), sol interpolado por `now`/`sunrise`/`sunset`, `setInterval` 60s, gradient stroke, 3 pills (Amanece/Anochece/UV) con color por nivel UV |
+| **BrandLoader** | Spinner _aether ring_ con gradiente sky→indigo→violet + core pulsante. Usado como fallback de `next/dynamic` para el mapa |
+| **EmptyState** | Componente reutilizable ilustrado (icono gradient sky→blue + título + descripción + acción opcional). Aplicado en Sidebar favoritos vacíos |
+| **WMO color tokens** | Paleta científica en `:root`: `--wmo-temp-{frigid,cold,cool,mild,warm,hot,extreme}`, `--wmo-wind-{calm,light,moderate,strong,gale,storm}`, `--wmo-precip-{none,light,moderate,heavy,extreme}` |
+| **Keyframes globales** | `wi-spin`, `wi-fall`, `wi-snow`, `wi-flash`, `aether-ring`, `aether-pulse` en `@layer utilities`. Clase `.bg-aurora-dynamic` con stack de 2 radial-gradients + 1 linear, transición 1500ms |
+| **useMediaQuery hook** | Hook reactivo SSR-safe con `matchMedia`. Reemplaza la guarda CSS `lg:hidden` en `WidgetPanel` (vaul `Drawer.Portal` se monta en `<body>` y escapa la clase, lo que dejaba el drawer visible en desktop) |
+
+**Validaciones**:
+- `pnpm type-check` ✅
+- `pnpm lint` ✅ baseline preservada (4 errores pre-existentes)
+- `pnpm build` ✅ 36 páginas, build OK
+- Edge DevTools MCP @ 1912×948 → solo aside desktop visible, SunArc renderiza con sol cerca del atardecer, AuroraBackground oscuro nocturno, no errores nuevos
+
+**Aprendizajes técnicos**:
+- Tailwind v4: animaciones custom mejor declaradas como `[animation:wi-spin_22s_linear_infinite]` arbitrary que como utilities en config (cero fricción)
+- `prefers-reduced-motion`: ya hay regla global que pone `animation-duration: 0.01ms` — cubre todas las animaciones nuevas sin código por componente
+- vaul `Drawer.Portal` → renderiza en `document.body`. CSS `lg:hidden` en wrapper **NO** lo oculta. Solución: gate con JS (`useMediaQuery('(min-width:1024px)')`) y renderizar condicional
+- SVG arc geometry: `M 20 90 A 100 80 0 0 1 220 90` produce semicírculo elegante. Para posicionar sol: `angle = π·(1-progress)`, `x = 120 + 100·cos`, `y = 90 - 80·sin`
+- AuroraBackground lee de `useWeatherForecast(selectedLocation)` (TanStack Query cacheado) — sin fetch extra, usa la misma data que widgets
+
+---
+
 
 | Cambio | Detalle |
 |--------|---------|

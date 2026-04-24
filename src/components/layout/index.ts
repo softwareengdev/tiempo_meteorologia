@@ -7,3 +7,4 @@ export { Footer } from './footer';
 export { PWAInstall } from './pwa-install';
 export { WidgetPanel } from './widget-panel';
 export { OutdoorMode } from './outdoor-mode';
+export { AuroraBackground } from './aurora-background';

@@ -1,7 +1,8 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getForecast, searchLocations, getWeatherDescription, getWeatherIcon } from '@/lib/weather';
+import { getForecast, searchLocations, getWeatherDescription } from '@/lib/weather';
+import { WeatherIcon } from '@/components/icons';
 import { MAJOR_CITIES, SITE_URL, SITE_NAME, JsonLd } from '@/lib/seo';
 
 interface LocationPageProps {
@@ -132,7 +133,7 @@ export default async function LocationPage({ params }: LocationPageProps) {
                   Sensación: {Math.round(current.apparent_temperature)}°C
                 </p>
               </div>
-              <span className="text-7xl" aria-hidden="true">{getWeatherIcon(current.weather_code, current.is_day === 1)}</span>
+              <WeatherIcon code={current.weather_code} isDay={current.is_day === 1} size={96} animated={false} />
             </div>
 
             <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -157,7 +158,7 @@ export default async function LocationPage({ params }: LocationPageProps) {
                     <span className="w-20 text-sm font-medium capitalize text-white/70">
                       {i === 0 ? 'Hoy' : date.toLocaleDateString('es-ES', { weekday: 'short', day: 'numeric' })}
                     </span>
-                    <span className="text-2xl" aria-hidden="true">{getWeatherIcon(daily.weather_code[i], true)}</span>
+                    <WeatherIcon code={daily.weather_code[i]} isDay={true} size={32} animated={false} />
                     <span className="flex-1 text-sm text-white/50">
                       {getWeatherDescription(daily.weather_code[i])}
                     </span>

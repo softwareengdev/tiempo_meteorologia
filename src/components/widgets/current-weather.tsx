@@ -6,8 +6,9 @@ import {
 } from 'lucide-react';
 import { useWeatherForecast, useShare, useHaptic } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
-import { getWeatherDescription, getWeatherIcon, getWindDirection } from '@/lib/weather';
+import { getWeatherDescription, getWindDirection } from '@/lib/weather';
 import { Skeleton } from '@/components/ui/skeleton';
+import { WeatherIcon } from '@/components/icons';
 
 export function CurrentWeatherWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
@@ -91,11 +92,9 @@ export function CurrentWeatherWidget() {
           </span>
           <span className="mt-2 text-2xl text-white/50">°</span>
         </div>
-        <div className="mb-2 flex flex-col items-end">
-          <span className="text-5xl drop-shadow-md sm:text-6xl" aria-hidden>
-            {getWeatherIcon(current.weather_code, isDay)}
-          </span>
-          {(hi != null || lo != null) && (
+          <div className="mb-2 flex flex-col items-end">
+            <WeatherIcon code={current.weather_code} isDay={isDay} size={80} className="drop-shadow-md sm:size-24" />
+            {(hi != null || lo != null) && (
             <p className="mt-1 font-mono text-xs text-white/55">
               {hi != null && <span>↑ {Math.round(hi)}°</span>}
               {hi != null && lo != null && <span className="mx-1 text-white/25">·</span>}

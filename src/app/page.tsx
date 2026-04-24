@@ -1,14 +1,15 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Header, Sidebar, MobileBottomNav, PWAInstall, WidgetPanel } from '@/components/layout';
+import { Header, Sidebar, MobileBottomNav, PWAInstall, WidgetPanel, AuroraBackground } from '@/components/layout';
 import { AIChat } from '@/components/ai';
+import { BrandLoader } from '@/components/ui/brand-loader';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
 const WeatherMap = dynamic(
   () => import('@/components/map/weather-map').then((mod) => mod.WeatherMap),
-  { ssr: false, loading: () => <div className="flex h-full w-full items-center justify-center bg-[#0b1020]"><p className="text-white/40">Cargando mapa...</p></div> },
+  { ssr: false, loading: () => <div className="flex h-full w-full items-center justify-center bg-[#0b1020]"><BrandLoader label="Cargando mapa meteorológico…" /></div> },
 );
 
 export default function HomePage() {
@@ -25,6 +26,8 @@ export default function HomePage() {
           sidebarOpen ? 'md:ml-64' : 'ml-0',
         )}
       >
+        {/* Dynamic atmospheric backdrop reacts to current weather */}
+        <AuroraBackground />
         {/* Map fills the entire main area; the WidgetPanel floats on top */}
         <div className="absolute inset-0 pt-14">
           <WeatherMap />

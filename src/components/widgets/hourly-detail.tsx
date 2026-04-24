@@ -1,10 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Wind, Droplets, Gauge, Thermometer, CloudRain, Sun, Eye } from 'lucide-react';
+import { Wind } from 'lucide-react';
 import { useWeatherForecast } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
-import { getWeatherIcon, getWeatherDescription } from '@/lib/weather';
+import { WeatherIcon } from '@/components/icons';
 
 export function HourlyDetailWidget() {
   const selectedLocation = useWeatherStore((s) => s.selectedLocation);
@@ -57,9 +57,7 @@ export function HourlyDetailWidget() {
               <span className="w-12 font-medium text-white/70">
                 {isNow ? 'Ahora' : hour}
               </span>
-              <span className="text-base">
-                {getWeatherIcon(hourly.weather_code[i], hourly.temperature_2m[i] > 0)}
-              </span>
+              <WeatherIcon code={hourly.weather_code[i]} isDay={hourly.temperature_2m[i] > 0} size={22} animated={isNow} />
               <span className="w-10 text-right font-medium text-white">
                 {Math.round(hourly.temperature_2m[i])}°
               </span>

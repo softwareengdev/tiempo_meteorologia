@@ -6,6 +6,7 @@ import {
 import { useWeatherStore } from '@/lib/stores';
 import type { WeatherLayer } from '@/types';
 import { cn } from '@/lib/utils';
+import { EmptyState } from '@/components/ui/empty-state';
 
 const LAYER_CONFIG: {
   id: WeatherLayer;
@@ -105,9 +106,12 @@ export function Sidebar() {
           <Star className="h-3.5 w-3.5 text-amber-400" /> Favoritos
         </h3>
         {favorites.length === 0 ? (
-          <p className="text-xs text-white/30">
-            Pulsa la estrella ⭐ junto a la búsqueda para guardar ubicaciones.
-          </p>
+          <EmptyState
+            icon={Star}
+            title="Sin favoritos"
+            description="Pulsa la estrella junto a la búsqueda para guardar tus ubicaciones."
+            className="bg-transparent border-white/8 p-4 text-xs"
+          />
         ) : (
           <ul className="space-y-1">
             {favorites.map((f) => (
