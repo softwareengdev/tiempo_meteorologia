@@ -34,10 +34,12 @@ export async function getForecast(
     latitude: coords.latitude.toString(),
     longitude: coords.longitude.toString(),
     current: CURRENT_PARAMS,
+    minutely_15: 'precipitation,precipitation_probability',
     hourly: HOURLY_PARAMS,
     daily: DAILY_PARAMS,
     timezone: 'auto',
     forecast_days: '7',
+    forecast_minutely_15: '24',
   });
 
   if (model) {

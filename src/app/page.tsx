@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { Header, Sidebar, MobileBottomNav, PWAInstall, WidgetPanel, AuroraBackground } from '@/components/layout';
 import { AIChat } from '@/components/ai';
 import { BrandLoader } from '@/components/ui/brand-loader';
+import { StormHunter } from '@/components/map';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 
@@ -32,6 +33,7 @@ export default function HomePage() {
         <div className="absolute inset-0 pt-14">
           <WeatherMap />
         </div>
+        <StormHunter />
         <WidgetPanel />
       </main>
 

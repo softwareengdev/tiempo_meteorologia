@@ -13,6 +13,32 @@ description: "Roadmap de 6 fases para llevar AetherCast al nivel de las mejores 
 
 ---
 
+## ✅ Fase 4 — Funcionalidades Killer (COMPLETADA · 2026-04-24)
+
+| Cambio | Detalle |
+|--------|---------|
+| **PrecipNow™ (nowcasting 2 h)** | Widget en pestaña "Ahora" que consume `minutely_15` de Open-Meteo (nuevo en `lib/weather/api.ts`: `minutely_15='precipitation,precipitation_probability'` + `forecast_minutely_15='24'`). Sparkline SVG 280×60 con 8 buckets de 15 min, gradient bars, 3 tonos (dry/soon/now) y headline contextual: "Sin precipitación esperada", "Lluvia en ~Xmin", "Está lloviendo ahora". Renderiza `null` si la lat/lon no devuelve datos minutely. |
+| **OutfitRecommender** | Widget _"¿Qué me pongo?"_ basado en reglas (`recommend()` en `outfit-recommender.tsx`). 7 brackets de temperatura sobre la sensación térmica media de las próximas 6 h + tips capa-a-capa según lluvia máx, viento máx y UV máx. Devuelve `{emoji, title, description, tips[]}` sin necesidad de IA. |
+| **Comparador de ciudades** (`/comparador`) | Hasta 4 ciudades en paralelo con `useQueries`. Mobile: `flex snap-x` carrusel (78vw cards). Desktop: `grid` con `gridTemplateColumns: repeat(N, minmax(0,1fr))` dinámico. CityCard muestra WeatherIcon + temp + máx/mín + 6 stats (sensación, viento, humedad, lluvia, UV, prob). CityPicker modal con búsqueda en vivo + sugerencias desde `MAJOR_CITIES`. SSR con metadata + JsonLd WebApplication. |
+| **AI Workers REST** (`/api/ai/chat`) | Edge route que llama a Cloudflare Workers AI (`@cf/meta/llama-3.1-8b-instruct`) vía REST con `CLOUDFLARE_ACCOUNT_ID` + `CLOUDFLARE_AI_TOKEN`. SYSTEM_PROMPT en español (máx 4 frases, 1-2 emojis), `buildContext` serializa `CurrentWeather`. Fallback automático a `generateAIResponse` rule-based si faltan envs o falla la API. Chat añade badge `✨ Llama 3.1 · Workers AI` cuando `source === 'workers-ai'`. |
+| **StormHunter mode** | Botón flotante (`top-20 right-4 lg:top-4 lg:right-[26rem]`) con icono Zap + glow violeta. `toggleStormHunter()` en el store activa simultáneamente las capas `cape`, `wind_gusts` y `precipitation`. Banner top-center con punto amarillo pulsante (`wi-flash`) cuando está activo. Persistido en localStorage. |
+| **Header nav** | Nuevo enlace "Comparar" (icono `GitCompare`) entre Dashboard y Pro. |
+
+**Pendientes deferred a futuras iteraciones:**
+- Push notifications de alertas (Web Push + VAPID)
+- Embed iframe `<iframe src="/embed/madrid">` para terceros
+- Public API REST con rate-limit (Cloudflare Workers + KV)
+- AEMET official alerts feed (CAP XML)
+- Blitzortung WebSocket para markers de rayos en tiempo real
+
+**Validaciones**:
+- `pnpm type-check` ✅
+- `pnpm lint` ✅ (4 errores baseline, sin nuevos)
+- `pnpm build` ✅ (37 páginas, `/comparador` static, `/api/ai/chat` edge)
+- Smoke test Edge MCP ✅ (PrecipNow render, Outfit chip "Fresco · Chaqueta ligera", StormHunter activa 3 capas + banner, /comparador 3 cities side-by-side)
+
+---
+
 ## ✅ Fase 3 — UI/UX Polish & Branding (COMPLETADA · 2026-04-24)
 
 | Cambio | Detalle |

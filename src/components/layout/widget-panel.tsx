@@ -14,6 +14,7 @@ import {
   CurrentWeatherWidget, AlertsWidget, AirQualityWidget, SunriseSunsetWidget,
   HourlyChartWidget, HourlyDetailWidget, WindChartWidget,
   DailyForecastWidget, PressureChartWidget, MarineWidget, AstronomyWidget,
+  PrecipNowWidget, OutfitRecommenderWidget,
 } from '@/components/widgets';
 
 type Tab = 'now' | 'today' | 'week' | 'detail';
@@ -33,6 +34,8 @@ function PanelContent({ tab }: { tab: Tab }) {
       return (
         <>
           <CurrentWeatherWidget />
+          <PrecipNowWidget />
+          <OutfitRecommenderWidget />
           <AlertsWidget />
           <AirQualityWidget />
           <SunriseSunsetWidget />

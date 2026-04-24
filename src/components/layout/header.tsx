@@ -1,6 +1,6 @@
 'use client';
 
-import { Cloud, Menu, X, LayoutDashboard, Map, Activity, Star } from 'lucide-react';
+import { Cloud, Menu, X, LayoutDashboard, Map, Activity, Star, GitCompare } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -49,6 +49,7 @@ export function Header() {
           {[
             { href: '/', icon: Map, label: 'Mapa', accent: false },
             { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', accent: false },
+            { href: '/comparador', icon: GitCompare, label: 'Comparar', accent: false },
             { href: '/pro', icon: Activity, label: 'Pro', accent: true },
           ].map((item) => {
             const active = pathname === item.href;

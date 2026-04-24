@@ -5,13 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Bot, User, Sparkles } from 'lucide-react';
 import { useWeatherForecast } from '@/lib/hooks';
 import { useWeatherStore } from '@/lib/stores';
-import { generateAIResponse, generateWeatherSummary } from '@/lib/ai';
+import { generateWeatherSummary } from '@/lib/ai';
 
 interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   timestamp: Date;
+  source?: 'workers-ai' | 'rules';
 }
 
 export function AIChat() {
@@ -55,19 +56,36 @@ export function AIChat() {
     };
 
     setMessages((prev) => [...prev, userMessage]);
+    const userText = input.trim();
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI thinking
-    await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200));
-
-    const response = generateAIResponse(input.trim(), data.current, locationName);
+    let reply = '';
+    let source: 'workers-ai' | 'rules' = 'rules';
+    try {
+      const res = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          message: userText,
+          location: locationName,
+          current: data.current,
+          history: messages.slice(-6).map((m) => ({ role: m.role, content: m.content })),
+        }),
+      });
+      const json = (await res.json()) as { reply?: string; source?: 'workers-ai' | 'rules' };
+      reply = json.reply ?? 'Lo siento, no he podido procesar tu pregunta.';
+      source = json.source ?? 'rules';
+    } catch {
+      reply = generateWeatherSummary(data.current, locationName);
+    }
 
     const assistantMessage: ChatMessage = {
       id: (Date.now() + 1).toString(),
       role: 'assistant',
-      content: response,
+      content: reply,
       timestamp: new Date(),
+      source,
     };
 
     setMessages((prev) => [...prev, assistantMessage]);
@@ -134,6 +152,11 @@ export function AIChat() {
                     }`}
                   >
                     {msg.content}
+                    {msg.role === 'assistant' && msg.source === 'workers-ai' && (
+                      <span className="mt-1 block text-[9px] tracking-wider text-sky-300/70 uppercase">
+                        ✨ Llama 3.1 · Workers AI
+                      </span>
+                    )}
                   </div>
                   {msg.role === 'user' && (
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10">

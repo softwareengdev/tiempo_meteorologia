@@ -40,6 +40,8 @@ interface WeatherStore {
   setMobileTab: (t: 'now' | 'today' | 'week' | 'detail') => void;
   outdoorMode: boolean;
   toggleOutdoorMode: () => void;
+  stormHunter: boolean;
+  toggleStormHunter: () => void;
 }
 
 export const useWeatherStore = create<WeatherStore>()(
@@ -112,6 +114,17 @@ export const useWeatherStore = create<WeatherStore>()(
       setMobileTab: (t) => set({ mobileTab: t }),
       outdoorMode: false,
       toggleOutdoorMode: () => set((state) => ({ outdoorMode: !state.outdoorMode })),
+      stormHunter: false,
+      toggleStormHunter: () =>
+        set((state) => {
+          if (state.stormHunter) {
+            return { stormHunter: false };
+          }
+          // Activar capas relevantes para caza-tormentas
+          const need: WeatherLayer[] = ['cape', 'wind_gusts', 'precipitation'];
+          const merged = Array.from(new Set([...state.activeLayers, ...need]));
+          return { stormHunter: true, activeLayers: merged };
+        }),
     }),
     {
       name: 'aethercast-weather-store',
@@ -123,6 +136,7 @@ export const useWeatherStore = create<WeatherStore>()(
         favorites: state.favorites,
         outdoorMode: state.outdoorMode,
         mobileTab: state.mobileTab,
+        stormHunter: state.stormHunter,
       }),
     },
   ),

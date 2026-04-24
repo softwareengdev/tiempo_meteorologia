@@ -74,6 +74,12 @@ export interface CurrentWeather {
   wind_gusts_10m: number;
 }
 
+export interface MinutelyForecast {
+  time: string[];
+  precipitation: number[];
+  precipitation_probability?: number[];
+}
+
 export interface WeatherResponse {
   latitude: number;
   longitude: number;
@@ -83,6 +89,7 @@ export interface WeatherResponse {
   timezone_abbreviation: string;
   elevation: number;
   current?: CurrentWeather;
+  minutely_15?: MinutelyForecast;
   hourly?: HourlyForecast;
   daily?: DailyForecast;
 }

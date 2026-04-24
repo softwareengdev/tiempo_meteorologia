@@ -12,3 +12,5 @@ export { ClimateHistoryWidget } from './climate-history';
 export { AirQualityWidget } from './air-quality';
 export { MarineWidget } from './marine';
 export { AstronomyWidget } from './astronomy';
+export { PrecipNowWidget } from './precip-now';
+export { OutfitRecommenderWidget } from './outfit-recommender';
