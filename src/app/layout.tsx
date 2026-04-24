@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter, Manrope, JetBrains_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers';
+import { WebVitalsReporter } from '@/components/analytics/web-vitals';
 import { JsonLd, organizationJsonLd, websiteJsonLd, webApplicationJsonLd, SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from '@/lib/seo';
 import './globals.css';
 
@@ -41,7 +42,15 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   alternates: {
     canonical: '/',
-    languages: { 'es-ES': '/', 'en-US': '/?lang=en' },
+    languages: {
+      'es-ES': '/',
+      'es-MX': '/',
+      'es-AR': '/',
+      'es-CO': '/',
+      'es-CL': '/',
+      'es-419': '/',
+      'x-default': '/',
+    },
   },
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
@@ -53,7 +62,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     siteName: SITE_NAME,
     images: [{
-      url: '/opengraph-image',
+      url: '/og.png',
       width: 1200,
       height: 630,
       alt: `${SITE_NAME} — el tiempo más preciso del planeta`,
@@ -65,7 +74,7 @@ export const metadata: Metadata = {
     description: SITE_DESCRIPTION,
     site: '@aethercast',
     creator: '@aethercast',
-    images: ['/opengraph-image'],
+    images: ['/og.png'],
   },
   robots: {
     index: true,
@@ -134,6 +143,7 @@ export default function RootLayout({
       </head>
       <body className="flex min-h-dvh flex-col bg-[#0b1020] text-white">
         <Providers>{children}</Providers>
+        <WebVitalsReporter />
       </body>
     </html>
   );

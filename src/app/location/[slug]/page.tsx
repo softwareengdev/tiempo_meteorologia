@@ -3,7 +3,16 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getForecast, searchLocations, getWeatherDescription } from '@/lib/weather';
 import { WeatherIcon } from '@/components/icons';
-import { MAJOR_CITIES, SITE_URL, SITE_NAME, JsonLd } from '@/lib/seo';
+import {
+  MAJOR_CITIES,
+  SITE_URL,
+  SITE_NAME,
+  JsonLd,
+  weatherDataFeedJsonLd,
+  breadcrumbJsonLd,
+  faqJsonLd,
+  locationFaqs,
+} from '@/lib/seo';
 
 interface LocationPageProps {
   params: Promise<{ slug: string }>;
@@ -65,34 +74,57 @@ export default async function LocationPage({ params }: LocationPageProps) {
   const cityName = city?.name ?? location.name;
   const countryName = city?.country ?? location.country;
 
-  const breadcrumbLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Inicio', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Tiempo por ciudades', item: `${SITE_URL}/#ciudades` },
-      { '@type': 'ListItem', position: 3, name: cityName, item: `${SITE_URL}/location/${slug}` },
-    ],
-  };
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: 'Inicio', url: SITE_URL },
+    { name: 'Ciudades', url: `${SITE_URL}/ciudades` },
+    { name: cityName, url: `${SITE_URL}/location/${slug}` },
+  ]);
 
   const placeLd = current ? {
     '@context': 'https://schema.org',
     '@type': 'Place',
     name: cityName,
+    url: `${SITE_URL}/location/${slug}`,
     address: { '@type': 'PostalAddress', addressLocality: cityName, addressCountry: countryName },
     geo: { '@type': 'GeoCoordinates', latitude: location.latitude, longitude: location.longitude },
+    additionalProperty: [
+      { '@type': 'PropertyValue', name: 'currentTemperature', value: Math.round(current.temperature_2m), unitCode: 'CEL' },
+      { '@type': 'PropertyValue', name: 'apparentTemperature', value: Math.round(current.apparent_temperature), unitCode: 'CEL' },
+      { '@type': 'PropertyValue', name: 'relativeHumidity', value: current.relative_humidity_2m, unitCode: 'P1' },
+      { '@type': 'PropertyValue', name: 'windSpeed', value: Math.round(current.wind_speed_10m), unitCode: 'KMH' },
+      { '@type': 'PropertyValue', name: 'pressure', value: Math.round(current.pressure_msl), unitCode: 'HPA' },
+      { '@type': 'PropertyValue', name: 'cloudCover', value: current.cloud_cover, unitCode: 'P1' },
+    ],
   } : null;
+
+  const dataFeedLd = daily ? weatherDataFeedJsonLd({
+    cityName,
+    url: `${SITE_URL}/location/${slug}`,
+    latitude: location.latitude,
+    longitude: location.longitude,
+    daily: {
+      time: daily.time,
+      temperature_2m_max: daily.temperature_2m_max,
+      temperature_2m_min: daily.temperature_2m_min,
+      precipitation_sum: daily.precipitation_sum,
+      wind_speed_10m_max: daily.wind_speed_10m_max,
+    },
+  }) : null;
+
+  const faqLd = faqJsonLd(locationFaqs(cityName));
 
   return (
     <div className="min-h-dvh bg-gray-950 px-4 py-8">
       <JsonLd data={breadcrumbLd} />
       {placeLd && <JsonLd data={placeLd} />}
+      {dataFeedLd && <JsonLd data={dataFeedLd} />}
+      <JsonLd data={faqLd} />
 
       <div className="mx-auto max-w-4xl">
         <nav aria-label="Migas de pan" className="mb-4 text-xs text-white/50">
           <Link href="/" className="hover:text-sky-400">Inicio</Link>
           <span className="mx-2 text-white/20">/</span>
-          <Link href="/#ciudades" className="hover:text-sky-400">Ciudades</Link>
+          <Link href="/ciudades" className="hover:text-sky-400">Ciudades</Link>
           <span className="mx-2 text-white/20">/</span>
           <span className="text-white/70">{cityName}</span>
         </nav>
@@ -189,6 +221,31 @@ export default async function LocationPage({ params }: LocationPageProps) {
               >
                 Tiempo en {c.name}
               </Link>
+            ))}
+          </div>
+          <div className="mt-3 text-right">
+            <Link href="/ciudades" className="text-xs text-sky-400 hover:underline">
+              Ver las {MAJOR_CITIES.length}+ ciudades disponibles →
+            </Link>
+          </div>
+        </section>
+
+        <section className="mt-10" aria-labelledby="faq-title">
+          <h2 id="faq-title" className="mb-4 text-lg font-semibold text-white">
+            Preguntas frecuentes sobre el tiempo en {cityName}
+          </h2>
+          <div className="space-y-3">
+            {locationFaqs(cityName).map((f) => (
+              <details
+                key={f.question}
+                className="group rounded-xl border border-white/5 bg-white/[0.02] p-4 transition open:border-sky-400/30 open:bg-white/5"
+              >
+                <summary className="cursor-pointer list-none text-sm font-medium text-white/90 marker:hidden">
+                  <span className="mr-2 inline-block transition group-open:rotate-90">▸</span>
+                  {f.question}
+                </summary>
+                <p className="mt-3 pl-6 text-sm leading-relaxed text-white/65">{f.answer}</p>
+              </details>
             ))}
           </div>
         </section>

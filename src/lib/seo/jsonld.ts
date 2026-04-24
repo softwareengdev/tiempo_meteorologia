@@ -94,3 +94,84 @@ export function placeWeatherJsonLd(opts: {
     ...(opts.description && { description: opts.description }),
   };
 }
+
+/**
+ * Weather forecast as a Schema.org DataFeed. Each daily prediction is a DataFeedItem
+ * containing an Observation with relevant variables (temperature max/min, precipitation, wind).
+ * Google parses DataFeed/Observation for rich results in the Search Console "Weather data" category.
+ */
+export function weatherDataFeedJsonLd(opts: {
+  cityName: string;
+  url: string;
+  latitude: number;
+  longitude: number;
+  daily: {
+    time: string[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+    precipitation_sum: number[];
+    wind_speed_10m_max: number[];
+  };
+}) {
+  const place = {
+    '@type': 'Place',
+    name: opts.cityName,
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: opts.latitude,
+      longitude: opts.longitude,
+    },
+  };
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'DataFeed',
+    name: `Pronóstico meteorológico 7 días — ${opts.cityName}`,
+    url: opts.url,
+    dataFeedElement: opts.daily.time.map((day, i) => ({
+      '@type': 'DataFeedItem',
+      dateCreated: day,
+      item: {
+        '@type': 'Observation',
+        observationDate: day,
+        observedNode: place,
+        measuredProperty: 'WeatherForecast',
+        marginOfError: { '@type': 'QuantitativeValue', value: 1, unitCode: 'CEL' },
+        valueReference: [
+          { '@type': 'PropertyValue', name: 'temperatureMax', value: opts.daily.temperature_2m_max[i], unitCode: 'CEL' },
+          { '@type': 'PropertyValue', name: 'temperatureMin', value: opts.daily.temperature_2m_min[i], unitCode: 'CEL' },
+          { '@type': 'PropertyValue', name: 'precipitationSum', value: opts.daily.precipitation_sum[i], unitCode: 'MMT' },
+          { '@type': 'PropertyValue', name: 'windSpeedMax', value: opts.daily.wind_speed_10m_max[i], unitCode: 'KMH' },
+        ],
+      },
+    })),
+  };
+}
+
+export interface FaqItem { question: string; answer: string }
+
+export function faqJsonLd(items: FaqItem[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((it) => ({
+      '@type': 'Question',
+      name: it.question,
+      acceptedAnswer: { '@type': 'Answer', text: it.answer },
+    })),
+  };
+}
+
+export function itemListJsonLd(opts: { name: string; items: { name: string; url: string }[] }) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: opts.name,
+    numberOfItems: opts.items.length,
+    itemListElement: opts.items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: it.name,
+      url: it.url,
+    })),
+  };
+}

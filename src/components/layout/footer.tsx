@@ -43,6 +43,7 @@ export function Footer() {
                 Tiempo en {c.name}
               </FooterLink>
             ))}
+            <FooterLink href="/ciudades">Ver todas →</FooterLink>
           </FooterCol>
 
           <FooterCol title="Empresa">

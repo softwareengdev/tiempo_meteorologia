@@ -13,6 +13,34 @@ description: "Roadmap de 6 fases para llevar AetherCast al nivel de las mejores 
 
 ---
 
+---
+
+## ✅ Fase 5 — SEO & Indexación profesional (COMPLETADA · 2026-04-24)
+
+| Cambio | Detalle |
+|--------|---------|
+| **MAJOR_CITIES 20 → 160+** | `src/lib/seo/constants.ts` ampliado con todas las capitales provinciales españolas (67) + LATAM (México 9, Argentina 7, Colombia 5, Perú 3, Chile 3 + Venezuela/Ecuador/Bolivia/Paraguay/Uruguay/Costa Rica/Panamá/Cuba/Dominicana/PR) + Europa 25 + Norteamérica 11 + Asia 12 + África 5 + Oceanía 3. Nuevas exportaciones `CITIES_BY_COUNTRY` y `CITY_COUNTRIES` (España fija primero, resto alfabético). **Slugs renombrados**: `tenerife → santa-cruz-de-tenerife`, `mexico-df → ciudad-de-mexico` (redirects 301 en `_redirects`). |
+| **`/ciudades` hub page** | SSR en `src/app/ciudades/page.tsx`. Pill-nav superior con anclas por país (`#espana`, `#mexico`...), secciones ordenadas por población dentro de cada país, formato `Intl.NumberFormat` para población. JSON-LD: `breadcrumb` + `ItemList` (160+ items) + `FAQ`. Linkado desde footer "Ver todas →". |
+| **Sitemap split (index + 2 niños)** | `src/app/sitemap.ts` usa `generateSitemaps()` retornando `[{id:'pages'},{id:'cities'}]`. Next 16 emite automáticamente `/sitemap.xml` (índice) + `/sitemap/pages.xml` + `/sitemap/cities.xml`. Prioridad dinámica por ciudad (0.85 si pop>1M, 0.75 resto). El `pages` sitemap añade `/ciudades`, `/comparador` y anclas por país. |
+| **JSON-LD enriquecido** | `weatherDataFeedJsonLd()` (Schema.org `DataFeed` con `Observation`/`PropertyValue` por día — unitCode CEL/MMT/KMH/HPA/P1), `faqJsonLd()` + tipo `FaqItem`, `itemListJsonLd()`. `placeWeatherJsonLd` enriquecido con `additionalProperty` (currentTemp, apparentTemp, humidity, windSpeed, pressure, cloudCover) en cada `/location/[slug]`. |
+| **FAQ visible + estructurado** | Nueva librería `src/lib/seo/faqs.ts` con `HOME_FAQS` (6 Qs) + `locationFaqs(name)` (4 Qs por ciudad). Renderizado visible con `<details>` accesibles + JSON-LD FAQPage en `/sobre`, `/ciudades`, y cada `/location/[slug]`. |
+| **Hreflang correcto** | `src/app/layout.tsx` reemplaza el `en-US` falso por locales españolas reales: `es-ES`, `es-MX`, `es-AR`, `es-CO`, `es-CL`, `es-419`, `x-default`. |
+| **Robots.txt extendido** | `src/app/robots.ts`: 12+ user-agents explícitos. Permite bots de búsqueda (Googlebot, Bingbot, Slurp, DuckDuckBot, YandexBot, Baidu, Applebot) **y bots de IA opt-in** (GPTBot, ChatGPT-User, PerplexityBot, ClaudeBot, Google-Extended, CCBot). Bloquea scrapers SEO agresivos (AhrefsBot, SemrushBot, MJ12bot, DotBot). Sitemap referenciado como array de 3 URLs. |
+| **OG static + branded** | `scripts/generate-og.mjs` genera `public/og.png` (1200×630) con sharp a partir de SVG inline (aurora gradient + grid + brand mark + headline + 5 model pills). Reemplaza `next/og ImageResponse` que es **incompatible con `output:'export'`** en Next 16 (problema con `Geist-Regular.ttf.bin`). Redirect `/opengraph-image → /og.png` para legacy. |
+| **Web Vitals reporter** | `src/components/analytics/web-vitals.tsx` (client) usa `useReportWebVitals` de `next/web-vitals`. En dev → `console.log`. En prod → beacon a `NEXT_PUBLIC_VITALS_ENDPOINT` si está definido (Cloudflare Worker / Plausible / Umami). Sin endpoint → no-op (compatible con static export). |
+
+**Validaciones ejecutadas:**
+- `pnpm type-check` ✅ 0 errores
+- `pnpm lint` ✅ misma baseline (4 errores pre-existentes Phase 1-4, 0 nuevos)
+- `pnpm build` ✅ Compila en 17s. 179 páginas estáticas (160 location + hub ciudades + sitemap split). `/sitemap/pages.xml` y `/sitemap/cities.xml` emitidos correctamente.
+
+**⚠️ Lecciones aprendidas:**
+- `next/og` ImageResponse **NO funciona con `output:'export'`** en Next 16 (webpack/turbopack no parsean `.ttf.bin`). Usar SVG → PNG con sharp en build script.
+- En PowerShell, `Remove-Item src\app\location\[slug]\file.tsx` falla silenciosamente — `[slug]` es wildcard. Usar `-LiteralPath`.
+- `/api/vitals` no se puede crear como edge route con static export — usar endpoint externo configurable.
+
+---
+
 ## ✅ Fase 4 — Funcionalidades Killer (COMPLETADA · 2026-04-24)
 
 | Cambio | Detalle |

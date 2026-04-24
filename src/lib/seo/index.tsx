@@ -1,5 +1,6 @@
 export * from './constants';
 export * from './jsonld';
+export * from './faqs';
 
 export function JsonLd({ data }: { data: object }) {
   return (

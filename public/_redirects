@@ -2,3 +2,8 @@
 /index  /  301
 /clima  /  301
 /tiempo  /  301
+
+# Phase 5 — slug renames (preserve legacy URLs)
+/location/tenerife        /location/santa-cruz-de-tenerife  301
+/location/mexico-df       /location/ciudad-de-mexico        301
+/opengraph-image          /og.png                           301
