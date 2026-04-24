@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, Manrope, JetBrains_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { WebVitalsReporter } from '@/components/analytics/web-vitals';
+import { CloudflareAnalytics } from '@/components/analytics/cloudflare';
 import { JsonLd, organizationJsonLd, websiteJsonLd, webApplicationJsonLd, SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from '@/lib/seo';
 import './globals.css';
 
@@ -135,8 +136,12 @@ export default function RootLayout({
       <head>
         <link rel="preconnect" href="https://api.open-meteo.com" />
         <link rel="preconnect" href="https://geocoding-api.open-meteo.com" />
+        <link rel="preconnect" href="https://air-quality-api.open-meteo.com" />
+        <link rel="preconnect" href="https://marine-api.open-meteo.com" />
         <link rel="preconnect" href="https://basemaps.cartocdn.com" />
+        <link rel="preconnect" href="https://tilecache.rainviewer.com" />
         <link rel="dns-prefetch" href="https://api.open-meteo.com" />
+        <link rel="dns-prefetch" href="https://api.rainviewer.com" />
         <JsonLd data={organizationJsonLd} />
         <JsonLd data={websiteJsonLd} />
         <JsonLd data={webApplicationJsonLd} />
@@ -144,6 +149,7 @@ export default function RootLayout({
       <body className="flex min-h-dvh flex-col bg-[#0b1020] text-white">
         <Providers>{children}</Providers>
         <WebVitalsReporter />
+        <CloudflareAnalytics />
       </body>
     </html>
   );

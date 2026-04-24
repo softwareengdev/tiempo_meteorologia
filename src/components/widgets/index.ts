@@ -1,14 +1,10 @@
+// Eager-loaded widgets (lightweight, no chart libraries).
+// Chart widgets (recharts) are exported separately from './lazy' as next/dynamic chunks.
 export { CurrentWeatherWidget } from './current-weather';
-export { HourlyChartWidget } from './hourly-chart';
 export { DailyForecastWidget } from './daily-forecast';
 export { HourlyDetailWidget } from './hourly-detail';
-export { WindChartWidget, PressureChartWidget } from './weather-charts';
 export { SunriseSunsetWidget } from './sunrise-sunset';
-export { MeteogramWidget } from './meteogram';
-export { HumidityWidget } from './humidity';
-export { ModelComparisonWidget } from './model-comparison';
 export { AlertsWidget } from './alerts';
-export { ClimateHistoryWidget } from './climate-history';
 export { AirQualityWidget } from './air-quality';
 export { MarineWidget } from './marine';
 export { AstronomyWidget } from './astronomy';

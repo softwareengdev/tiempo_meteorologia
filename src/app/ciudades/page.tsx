@@ -105,7 +105,7 @@ export default function CiudadesHubPage() {
               key={country}
               id={slugifyCountry(country)}
               aria-labelledby={`country-${slugifyCountry(country)}`}
-              className="scroll-mt-24"
+              className="scroll-mt-24 [content-visibility:auto] [contain-intrinsic-size:1px_500px]"
             >
               <h2
                 id={`country-${slugifyCountry(country)}`}

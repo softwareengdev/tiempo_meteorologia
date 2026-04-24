@@ -3,15 +3,17 @@
 import dynamic from 'next/dynamic';
 import { Header, MobileBottomNav } from '@/components/layout';
 import {
-  ModelComparisonWidget,
   AlertsWidget,
-  ClimateHistoryWidget,
   CurrentWeatherWidget,
-  MeteogramWidget,
   AirQualityWidget,
   AstronomyWidget,
   MarineWidget,
 } from '@/components/widgets';
+import {
+  ModelComparisonWidget,
+  ClimateHistoryWidget,
+  MeteogramWidget,
+} from '@/components/widgets/lazy';
 
 const WeatherMap = dynamic(() => import('@/components/map/weather-map').then((m) => m.WeatherMap), { ssr: false });
 

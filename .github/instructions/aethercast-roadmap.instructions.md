@@ -11,7 +11,29 @@ description: "Roadmap de 6 fases para llevar AetherCast al nivel de las mejores 
 
 ---
 
----
+## ✅ Fase 6 — Performance & Observabilidad (COMPLETADA · 2026-04-24)
+
+| Cambio | Detalle |
+|--------|---------|
+| **Lazy chart widgets (recharts aislado)** | Nuevo `src/components/widgets/lazy.tsx` reexporta los 7 widgets que dependen de recharts vía `next/dynamic({ ssr:false, loading: ChartSkeleton })`: `HourlyChartWidget`, `WindChartWidget`, `PressureChartWidget`, `MeteogramWidget`, `HumidityWidget`, `ModelComparisonWidget`, `ClimateHistoryWidget`. **Crítico**: estos widgets **fueron eliminados del barrel `widgets/index.ts`** porque la re-exportación eager hacía que webpack los metiera en el chunk principal pese al `dynamic()`. Cualquier nuevo widget con recharts debe ir solo a `lazy.tsx`. Resultado: chunk recharts **646 KB → 276 KB** y aislado como chunk async (`5958.*.js`). |
+| **`ChartSkeleton`** | `src/components/ui/chart-skeleton.tsx`. Shimmer CSS puro (sin librerías), `contentVisibility:auto` para skip de render off-screen, altura/label configurables. Loading state unificado para todos los widgets de gráfica. |
+| **Bundle analyzer** | `@next/bundle-analyzer` envuelve `next.config.ts` (activo con `ANALYZE=true`). Script `pnpm analyze` (usa `cross-env`) genera reportes interactivos en `.next/analyze/*.html`. `optimizePackageImports` añade `date-fns`. |
+| **Service Worker v4** | `public/sw.js` reescrito con 4 estrategias separadas: **SHELL** (HTML, network-first con timeout 3 s → fallback cache → `/offline` → `/`), **STATIC** (assets `_next/static/*`, cache-first), **API** (Open-Meteo, SWR + freshness stamp `x-aether-cached-at`, considera fresco <5 min para skip-network), **TILES** (RainViewer/Carto, cache-first con LRU trim a 250 entradas). Listener de mensaje `SKIP_WAITING` para upgrade UX. SHELL_URLS incluye `/offline` y `/og.png`. |
+| **`/offline` page** | `src/app/offline/page.tsx` — fallback estático para fallos de navegación bajo SW. `noindex`, retorna a `/` con CTA. |
+| **CloudflareAnalytics beacon** | `src/components/analytics/cloudflare.tsx` — script CF Web Analytics (privacy-first, sin cookies), gate con `NEXT_PUBLIC_CF_ANALYTICS_TOKEN` (no-op si vacío). Montado en `layout.tsx` tras `<WebVitalsReporter />`. |
+| **Resource hints** | `layout.tsx` añade 6 `<link rel="preconnect">` (`api.open-meteo.com`, `geocoding-api.open-meteo.com`, `air-quality-api.open-meteo.com`, `marine-api.open-meteo.com`, `basemaps.cartocdn.com`, `tilecache.rainviewer.com`) + 2 `dns-prefetch`. Acelera el primer fetch de datos y tiles. |
+| **Lighthouse CI** | `lighthouserc.json` con preset desktop, 5 URLs (`/`, `/ciudades`, `/location/madrid`, `/comparador`, `/sobre`). Presupuestos: perf ≥0.85, a11y ≥0.95, best-practices ≥0.9, SEO ≥0.95. Métricas: LCP ≤2500 ms, CLS ≤0.1, TBT ≤300 ms. Ejecutado por `treosh/lighthouse-ci-action@v12` en el workflow CI existente sobre la URL en producción. |
+| **content-visibility** | `/ciudades` aplica `[content-visibility:auto] [contain-intrinsic-size:1px_500px]` a cada `<section>` por país — el navegador omite layout/paint de secciones fuera de viewport. Mejora TBT y FCP en hub con 160+ ciudades. |
+
+**Validaciones ejecutadas:**
+- `pnpm type-check` ✅ 0 errores
+- `pnpm build` ✅ Compila limpio. 179 páginas estáticas. **Top chunks**: `8dd50394` (1006 KB, maplibre+framer — esperado), `5958` (276 KB, recharts aislado ↓ desde 646 KB), `20` (217 KB, framer), `2176` (202 KB), `d8ed9c07` (195 KB), `framework` (185 KB), `main` (128 KB). Recharts ya **no** carga en la ruta `/` ni en `widget-panel`.
+- Análisis de bundle reproducible con `pnpm analyze`.
+
+**⚠️ Lecciones aprendidas:**
+- **Los re-exports en barrels derrotan el code-splitting**: `next/dynamic()` no salva si el módulo dinámico está re-exportado eagerly desde un `index.ts` que el consumidor importa. Webpack ve el grafo estático del barrel y mete todo en el mismo chunk. Solución: el módulo dinámico **solo** debe ser accesible vía un path que NO esté en ningún barrel eager.
+- `optimizePackageImports` (Next config) **solo aplica a paquetes npm**, no a paths del proyecto (`@/components/*`). Para tree-shaking de barrels propios, hay que partir el barrel manualmente.
+- SW SWR sin freshness stamping degrada UX (responde con datos viejos antes de saber su edad). Escribir `x-aether-cached-at` al cachear y leerlo al servir resuelve el problema sin depender del header `Date`.
 
 ---
 

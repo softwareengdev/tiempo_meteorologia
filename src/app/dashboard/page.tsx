@@ -3,11 +3,15 @@
 import dynamic from 'next/dynamic';
 import { Header, Sidebar, MobileBottomNav } from '@/components/layout';
 import {
-  CurrentWeatherWidget, HourlyChartWidget, DailyForecastWidget,
-  SunriseSunsetWidget, WindChartWidget, PressureChartWidget,
-  MeteogramWidget, HumidityWidget, AirQualityWidget, AstronomyWidget,
+  CurrentWeatherWidget, DailyForecastWidget,
+  SunriseSunsetWidget,
+  AirQualityWidget, AstronomyWidget,
   AlertsWidget, MarineWidget,
 } from '@/components/widgets';
+import {
+  HourlyChartWidget, WindChartWidget, PressureChartWidget,
+  MeteogramWidget, HumidityWidget,
+} from '@/components/widgets/lazy';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';

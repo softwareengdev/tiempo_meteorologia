@@ -12,10 +12,13 @@ import { useHaptic, useMediaQuery } from '@/lib/hooks';
 import { SegmentedTabs } from '@/components/ui/segmented-tabs';
 import {
   CurrentWeatherWidget, AlertsWidget, AirQualityWidget, SunriseSunsetWidget,
-  HourlyChartWidget, HourlyDetailWidget, WindChartWidget,
-  DailyForecastWidget, PressureChartWidget, MarineWidget, AstronomyWidget,
+  HourlyDetailWidget,
+  DailyForecastWidget, MarineWidget, AstronomyWidget,
   PrecipNowWidget, OutfitRecommenderWidget,
 } from '@/components/widgets';
+import {
+  HourlyChartWidget, WindChartWidget, PressureChartWidget,
+} from '@/components/widgets/lazy';
 
 type Tab = 'now' | 'today' | 'week' | 'detail';
 

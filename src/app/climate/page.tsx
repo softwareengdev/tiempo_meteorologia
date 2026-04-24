@@ -1,7 +1,7 @@
 'use client';
 
 import { Header, Sidebar, MobileBottomNav } from '@/components/layout';
-import { ClimateHistoryWidget } from '@/components/widgets';
+import { ClimateHistoryWidget } from '@/components/widgets/lazy';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
