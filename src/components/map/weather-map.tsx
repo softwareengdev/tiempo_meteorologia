@@ -3,30 +3,35 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { useTheme } from 'next-themes';
 import { useWeatherStore } from '@/lib/stores';
 import { useWeatherOverlay } from './weather-overlay';
 import { MapLegend } from './map-legend';
 import { TimeSlider } from './time-slider';
 import { WindParticles } from './wind-particles';
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const MAP_STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 export function WeatherMap() {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<maplibregl.Map | null>(null);
   const marker = useRef<maplibregl.Marker | null>(null);
   const [mapInstance, setMapInstance] = useState<maplibregl.Map | null>(null);
+  const { resolvedTheme } = useTheme();
   const { mapView, setMapView, selectedLocation, setSelectedLocation, locationName, activeLayers } =
     useWeatherStore();
 
   useWeatherOverlay({ map: mapInstance, activeLayers });
+
+  const styleUrl = resolvedTheme === 'light' ? MAP_STYLE_LIGHT : MAP_STYLE_DARK;
 
   const initMap = useCallback(() => {
     if (!mapContainer.current || mapRef.current) return;
 
     const m = new maplibregl.Map({
       container: mapContainer.current,
-      style: MAP_STYLE,
+      style: styleUrl,
       center: [mapView.longitude, mapView.latitude],
       zoom: mapView.zoom,
       pitch: mapView.pitch || 0,
@@ -81,6 +86,12 @@ export function WeatherMap() {
       mapRef.current = null;
     };
   }, [initMap]);
+
+  useEffect(() => {
+    if (mapRef.current) {
+      try { mapRef.current.setStyle(styleUrl); } catch { /* noop */ }
+    }
+  }, [styleUrl]);
 
   useEffect(() => {
     if (!mapRef.current || !selectedLocation) return;
