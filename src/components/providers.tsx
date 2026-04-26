@@ -1,7 +1,6 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from 'next-themes';
 import { useState, type ReactNode } from 'react';
 
 export function Providers({ children }: { children: ReactNode }) {
@@ -27,9 +26,12 @@ export function Providers({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-        {children}
-      </ThemeProvider>
+      {/* AetherCast está diseñado primero para modo oscuro. El tema claro tiene
+          deuda visual conocida (Phase 7 backlog). La clase `.dark` se aplica
+          permanentemente desde el `<html>` (layout.tsx) — no necesitamos
+          ThemeProvider porque cualquier librería que la mute genera regresiones
+          en mobile. */}
+      {children}
     </QueryClientProvider>
   );
 }

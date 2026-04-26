@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Header, MobileBottomNav } from '@/components/layout';
 import {
   AlertsWidget,
   CurrentWeatherWidget,
@@ -20,7 +19,6 @@ const WeatherMap = dynamic(() => import('@/components/map/weather-map').then((m)
 export default function ProPage() {
   return (
     <div className="flex h-dvh flex-col bg-gradient-to-br from-[#0b1020] via-[#0f1730] to-[#0b1020]">
-      <Header />
       <main className="flex flex-1 overflow-hidden pt-14 pb-16 lg:pb-0">
         {/* Map half */}
         <div className="hidden w-1/2 lg:block">
@@ -48,7 +46,6 @@ export default function ProPage() {
           </div>
         </div>
       </main>
-      <MobileBottomNav />
     </div>
   );
 }

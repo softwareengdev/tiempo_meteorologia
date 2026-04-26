@@ -65,3 +65,6 @@ workbox-*.js
 .open-next/
 .vercel/
 
+
+# Local UI audit screenshots (Phase 7)
+.shots/

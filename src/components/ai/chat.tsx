@@ -101,10 +101,11 @@ export function AIChat() {
 
   return (
     <>
-      {/* FAB */}
+      {/* FAB — sits above mobile bottom-nav using --bottom-nav-h. */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed right-6 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/30 transition-transform hover:scale-110"
+        className="fixed right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/30 transition-transform hover:scale-110 md:right-6"
+        style={{ bottom: 'calc(var(--bottom-nav-h, 0px) + 1rem)' }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Abrir chat de IA"
@@ -119,7 +120,8 @@ export function AIChat() {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed right-6 bottom-24 z-50 flex h-[500px] w-96 flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-950/95 shadow-2xl backdrop-blur-xl"
+            className="fixed right-3 left-3 z-50 flex max-h-[min(70dvh,500px)] flex-col overflow-hidden rounded-2xl border border-white/10 bg-gray-950/95 shadow-2xl backdrop-blur-xl sm:right-6 sm:left-auto sm:w-96 sm:max-h-[500px] sm:h-[500px]"
+            style={{ bottom: 'calc(var(--bottom-nav-h, 0px) + 5rem)' }}
           >
             {/* Header */}
             <div className="flex items-center gap-3 border-b border-white/5 bg-gradient-to-r from-sky-500/10 to-blue-600/10 px-4 py-3">

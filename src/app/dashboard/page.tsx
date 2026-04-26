@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Header, Sidebar, MobileBottomNav } from '@/components/layout';
+import { Sidebar } from '@/components/layout';
 import {
   CurrentWeatherWidget, DailyForecastWidget,
   SunriseSunsetWidget,
@@ -27,7 +27,6 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#0b1020]">
-      <Header />
       <Sidebar />
 
       <main
@@ -74,7 +73,6 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-      <MobileBottomNav />
     </div>
   );
 }

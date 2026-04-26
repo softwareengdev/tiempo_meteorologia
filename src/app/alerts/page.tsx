@@ -1,6 +1,6 @@
 'use client';
 
-import { Header, Sidebar, MobileBottomNav } from '@/components/layout';
+import { Sidebar } from '@/components/layout';
 import { AlertsWidget, CurrentWeatherWidget } from '@/components/widgets';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,6 @@ export default function AlertsPage() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#0b1020]">
-      <Header />
       <Sidebar />
       <main
         className={cn(
@@ -47,7 +46,6 @@ export default function AlertsPage() {
           </div>
         </div>
       </main>
-      <MobileBottomNav />
     </div>
   );
 }

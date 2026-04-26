@@ -62,7 +62,9 @@ export const useWeatherStore = create<WeatherStore>()(
 
       selectedModel: 'best_match',
 
-      sidebarOpen: true,
+      // Default cerrada: en mobile evita tapar el contenido al primer paint;
+      // en desktop la rehidrata abierta el efecto en `app/page.tsx` (matchMedia).
+      sidebarOpen: false,
 
       setSelectedLocation: (coords, name) =>
         set({

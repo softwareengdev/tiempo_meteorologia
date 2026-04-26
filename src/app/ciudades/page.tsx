@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Header, MobileBottomNav, AuroraBackground } from '@/components/layout';
+import { AuroraBackground } from '@/components/layout';
 import { Footer } from '@/components/layout/footer';
 import {
   CITIES_BY_COUNTRY,
@@ -66,8 +66,6 @@ export default function CiudadesHubPage() {
       <JsonLd data={breadcrumb} />
       <JsonLd data={itemList} />
       <JsonLd data={faq} />
-
-      <Header />
       <AuroraBackground />
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-4 pb-20 pt-24">
@@ -142,7 +140,6 @@ export default function CiudadesHubPage() {
       </main>
 
       <Footer />
-      <MobileBottomNav />
     </div>
   );
 }

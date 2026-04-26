@@ -134,7 +134,11 @@ export function WidgetPanel() {
           <Drawer.Portal>
             <Drawer.Content
               aria-label="Panel meteorológico"
-              className="fixed inset-x-0 bottom-0 z-30 mx-auto flex h-[92dvh] max-w-3xl flex-col rounded-t-3xl border border-white/10 border-b-0 bg-[#0b1020]/95 shadow-[0_-12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-2xl outline-none"
+              className="fixed inset-x-0 z-30 mx-auto flex max-w-3xl flex-col rounded-t-3xl border border-white/10 border-b-0 bg-[#0b1020]/95 shadow-[0_-12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-2xl outline-none"
+              style={{
+                bottom: 'var(--bottom-nav-h, 0px)',
+                height: 'calc(92dvh - var(--bottom-nav-h, 0px))',
+              }}
             >
               <div className="mx-auto mt-2 mb-1 h-1.5 w-12 shrink-0 rounded-full bg-white/25" />
               <Drawer.Title className="sr-only">Información meteorológica</Drawer.Title>

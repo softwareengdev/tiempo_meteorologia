@@ -3,6 +3,8 @@ import { Inter, Manrope, JetBrains_Mono } from 'next/font/google';
 import { Providers } from '@/components/providers';
 import { WebVitalsReporter } from '@/components/analytics/web-vitals';
 import { CloudflareAnalytics } from '@/components/analytics/cloudflare';
+import { Header } from '@/components/layout/header';
+import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { JsonLd, organizationJsonLd, websiteJsonLd, webApplicationJsonLd, SITE_NAME, SITE_URL, SITE_DESCRIPTION, SITE_KEYWORDS } from '@/lib/seo';
 import './globals.css';
 
@@ -117,11 +119,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 5,
   viewportFit: 'cover',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0b1020' },
-  ],
-  colorScheme: 'dark light',
+  themeColor: '#0b1020',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({
@@ -131,7 +130,8 @@ export default function RootLayout({
     <html
       lang="es"
       suppressHydrationWarning
-      className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`dark ${inter.variable} ${manrope.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      style={{ colorScheme: 'dark' }}
     >
       <head>
         <link rel="preconnect" href="https://api.open-meteo.com" />
@@ -147,7 +147,11 @@ export default function RootLayout({
         <JsonLd data={webApplicationJsonLd} />
       </head>
       <body className="flex min-h-dvh flex-col bg-[#0b1020] text-white">
-        <Providers>{children}</Providers>
+        <Providers>
+          <Header />
+          {children}
+          <MobileBottomNav />
+        </Providers>
         <WebVitalsReporter />
         <CloudflareAnalytics />
       </body>

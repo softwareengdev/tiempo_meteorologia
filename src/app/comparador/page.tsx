@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Header, Footer, MobileBottomNav } from '@/components/layout';
+import { Footer } from '@/components/layout';
 import { CityCompareClient } from './client';
 import { JsonLd, SITE_URL } from '@/lib/seo';
 
@@ -35,7 +35,6 @@ export default function CompararPage() {
           offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
         }}
       />
-      <Header />
       <main className="min-h-dvh bg-[#0b1020] pt-14 pb-24 text-white md:pb-12">
         <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
           <header className="mb-6">
@@ -51,7 +50,6 @@ export default function CompararPage() {
         </div>
       </main>
       <Footer />
-      <MobileBottomNav />
     </>
   );
 }

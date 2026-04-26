@@ -1,6 +1,6 @@
 'use client';
 
-import { Header, Sidebar, MobileBottomNav } from '@/components/layout';
+import { Sidebar } from '@/components/layout';
 import { ClimateHistoryWidget } from '@/components/widgets/lazy';
 import { useWeatherStore } from '@/lib/stores';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,6 @@ export default function ClimatePage() {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#0b1020]">
-      <Header />
       <Sidebar />
       <main
         className={cn(
@@ -50,7 +49,6 @@ export default function ClimatePage() {
           </p>
         </div>
       </main>
-      <MobileBottomNav />
     </div>
   );
 }

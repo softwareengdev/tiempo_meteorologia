@@ -1,13 +1,197 @@
 ---
 applyTo: "**"
-description: "Roadmap de 6 fases para llevar AetherCast al nivel de las mejores webs meteorológicas del mundo. Auto-cargado por Copilot CLI como contexto global del proyecto."
+description: "Roadmap de mejora de AetherCast. Cabeza: Fase 7 (UI/UX & paridad web↔móvil, defectos accionables). Cola: histórico de Fases 1-6. Auto-cargado por Copilot CLI."
 ---
 
-# 🌩️ AetherCast — Roadmap de Mejora Mobile-First (6 Fases)
+# 🌩️ AetherCast — Roadmap (cabeza: Fase 7 · UI/UX & paridad)
+
+> **Última auditoría**: dual desktop (Edge DevTools MCP @ 1912×948, dev server local) + móvil (emulador Android Pixel 7 API 34, Chrome, viewport 1080×2400 con `adb reverse tcp:3000 tcp:3000`).
+> **Capturas**: `.shots/desktop/` y `.shots/mobile/`. Esta carpeta debe estar gitignorada.
+> **Filosofía**: ningún defecto pasa a Producción si no aparece como TODO en este documento con criterio de aceptación verificable.
+
+---
+
+## 🟥 FASE 7 — UI/UX Parity & Defect Cleanup *(prioridad crítica · cabeza del roadmap)*
+
+**Misión**: dejar la web y la versión móvil **funcionalmente equivalentes**, sin defectos visibles de renderizado, con navegación coherente, jerarquía visual correcta y modos claro/oscuro ambos legibles.
+
+### 7.0 Catálogo de defectos confirmados (auditoría dual)
+
+> Severidad: 🔴 bloquea uso · 🟠 rompe percepción de calidad · 🟡 mejora secundaria.
+
+#### A. Renderizado / contraste
+
+| ID | Sev | Síntoma | Ruta(s) afectadas | Causa raíz | Archivo objetivo |
+|----|-----|---------|-------------------|------------|------------------|
+| **A1** | 🔴 | Modo claro globalmente roto: párrafos, subtítulos y descripciones invisibles (texto blanco sobre fondo blanco). Visible en `<p>` con `text-white/55`, `text-white/65`, `text-white/70`. | `/landing`, `/sobre`, `/comparador`, `/dashboard`, `/pro`, `/precios`, `/legal/*` y todo lo que no sea `/` (la home está sobre `bg-[#0b1020]` por lo que se "ve"). | Cuerpos de página fijan colores con utilities `text-white/XX` en vez de tokens semánticos (`text-foreground`, `text-muted-foreground`). El tema light cambia `--background` pero no las clases hardcoded. | Todas las `app/**/page.tsx` que no sean `/` + `globals.css`. |
+| **A2** | 🔴 | Header siempre oscuro (`bg-gray-950/75`) incluso en modo claro → contraste invertido respecto al cuerpo de la página. | Todas. | `header.tsx:29` con clase fija dark. | `src/components/layout/header.tsx`. |
+| **A3** | 🟠 | Gradiente "AetherCast" + gradiente `text-gradient-sky` / `text-gradient-aurora` desaparecen sobre superficies claras (stops a blanco/translúcido). | `/dashboard` (h1 nombre de ciudad), `/pro` (cabecera de hero card), home en modo light. | Las utilities `.text-gradient-*` en `globals.css` están calibradas para fondos oscuros. | `src/app/globals.css` (variantes light) + `dashboard/page.tsx:53`. |
+| **A4** | 🟠 | "Comparativa honesta" tabla en `/landing`: la fila "AetherCast" tiene fondo gradient azul→violeta MUY claro y texto del mismo tono → ilegible. | `/landing`. | Hardcoded gradient sin contraste mínimo AA. | `src/app/landing/page.tsx`. |
+| **A5** | 🟠 | Mockup de teléfono en `/landing` se renderiza vacío (solo icono de nube). Debería mostrar preview real o screenshot estático. | `/landing`. | Componente espera datos client que no llegan o un `<img>` que no existe. | `src/app/landing/**` (revisar componente PhonePreview). |
+| **A6** | 🟠 | `/pro`: el área de mapa aparece **completamente amarilla** con la capa de temperatura activa (sin gradiente real). Indica fallback a "color extremo" cuando el sampling de Open-Meteo falla en `/pro`. | `/pro`. | `weather-overlay.tsx` clamp de fallback en error de fetch (probable timeout o CORS en el grid sampling de la primera carga). | `src/components/map/weather-overlay.tsx`. |
+| **A7** | 🟠 | Humedad dial en `/dashboard` muestra solo una astilla verde minúscula en lugar del anillo completo. | `/dashboard`. | `HumidityWidget` calcula radio/stroke con altura del padre antes de hidratar (ResponsiveContainer con altura cero al primer paint). | `src/components/widgets/humidity-widget.tsx`. |
+| **A8** | 🟡 | PrecipNow muestra "2" suelto sin sparkline. | Mobile drawer de `/`. | `precip-now.tsx` renderiza el número del bucket activo pero el SVG de barras no aparece (probable `width=0` mientras el drawer hace su animación). | `src/components/widgets/precip-now.tsx`. |
+| **A9** | 🟡 | Stats labels (Sensación / Viento / Humedad / UV máx) en cards de `/comparador` salen en gris muy claro casi invisible en modo light. | `/comparador`. | `text-white/40` en badges. | `src/app/comparador/client.tsx`. |
+| **A10** | 🟡 | Botón "Añadir" en `/comparador` (modo light) sale celeste claro sobre cyan claro → bajo contraste. | `/comparador`. | `bg-sky-100 text-sky-300`. | `src/app/comparador/client.tsx`. |
+
+#### B. Layout / superposición
+
+| ID | Sev | Síntoma | Donde | Causa raíz | Archivo |
+|----|-----|---------|-------|------------|---------|
+| **B1** | 🔴 | **Header móvil colapsado**: el wordmark "AetherCast" se renderiza ENCIMA del input de búsqueda. El botón sidebar (X/Menu), el logo, la nav y el search compiten por el mismo espacio sin `flex-1`/`min-w-0` correcto. | Todas las rutas en mobile (≤640px). | `header.tsx` usa `gap-2` + `shrink-0` en logo y `<LocationSearch />` sin reservar ancho mínimo, y la nav desktop no se oculta hasta `md:flex` pero el grupo izquierdo se desborda antes. | `src/components/layout/header.tsx` (líneas 32-46 y 90-104). |
+| **B2** | 🔴 | **Sidebar abierta por defecto** en mobile cubriendo todo el contenido al primer paint. | Todas las rutas. | `weather-store.ts:65` `sidebarOpen: true`. La sidebar se persiste y nunca se inicializa cerrada por breakpoint. | `src/lib/stores/weather-store.ts`. |
+| **B3** | 🟠 | Botón `Caza-tormentas` (StormHunter) aparece en rutas que no tienen mapa (`/dashboard`, `/comparador`...) — porque está mounted en `app/page.tsx` pero también filtra mal en otras o se pinta como FAB cuando no hay mapa. Verificar: en captura `/landing` aparece la "N" del Next dev overlay (eso es OK, falso positivo). El StormHunter sí está limitado a `/`. | `/`. | OK, mantener. | – |
+| **B4** | 🟠 | FAB AI Chat (esquina inferior derecha) tapa el botón "Más" del bottom-nav en mobile. | Mobile, todas las rutas con `<MobileBottomNav />` y `<AIChat />`. | El FAB se posiciona `bottom-6 right-6` sin tener en cuenta los 64px del bottom-nav. | `src/components/ai/ai-chat.tsx` (FAB) o `src/components/layout/widget-panel.tsx` (peek snap). |
+| **B5** | 🟠 | Geolocate del mapa (`bottom-left`) tapa el label "Mapa" del bottom-nav. | Mobile, `/`. | Maplibre default control posicionado sin offset bottom. | `src/components/map/weather-map.tsx` (en `addControl(GeolocateControl)`, definir `position` o offset CSS). |
+| **B6** | 🟠 | Banner PWA "Add to Home Screen" (Chrome móvil nativo) se monta encima del bottom-nav y tapa la nav. | Mobile, todas las rutas. | El banner es del navegador, no se puede ocultar — pero podemos compensar con `padding-bottom` extra cuando `display-mode: browser`. | `MobileBottomNav` o `globals.css`. |
+| **B7** | 🟠 | StormHunter FAB se sale del viewport por la derecha en móvil (clipping). | Mobile, `/`. | Posicionado `right-4` en mobile pero el contenedor está dentro de `<main>` con `overflow-hidden` y aside lateral. Verificar `right` en lugar de `lg:right-[26rem]`. | `src/components/map/storm-hunter.tsx`. |
+| **B8** | 🟡 | Outdoor mode + Theme toggle en header mobile se ven con iconos solapados con el input de búsqueda. | Mobile, todas. | Mismo origen que B1: el grupo derecho del header no tiene espacio. | `header.tsx`. |
+
+#### C. Navegación
+
+| ID | Sev | Síntoma | Donde | Causa raíz | Acción |
+|----|-----|---------|-------|------------|--------|
+| **C1** | 🟠 | Bottom-nav tiene 4 items (Mapa / Panel / Pro / Más). Falta entrada explícita para **Comparador**. La ruta solo es alcanzable desde header desktop. | Mobile. | 4-tabs decisión Phase 2; Comparar quedó fuera. | Reestructurar bottom-nav a 5 tabs: Mapa · Panel · Comparar · Pro · Más. O sustituir "Más" por "Comparar" y mover ajustes al sidebar. |
+| **C2** | 🟠 | Sidebar contiene controles del MAPA (capas, modelo, ubicación) que NO tienen sentido en `/dashboard`, `/comparador`, `/sobre`, etc. — pero la sidebar se renderiza en TODAS las rutas que la importan. | Todas las rutas con `<Sidebar />`. | `Sidebar.tsx` no inspecciona `pathname`. | Hacer que la sidebar muestre una sección distinta por ruta: en `/` capas+modelo; en `/dashboard` favoritos+ajustes; en `/comparador` historial; en `/sobre`/`/precios`/`/legal/*` ocultar la sidebar y dejar solo header+footer. |
+| **C3** | 🟠 | Header desktop: rutas `/landing`, `/sobre`, `/precios`, `/ciudades`, `/alerts`, `/climate` NO están en la nav principal — solo accesibles vía footer o tipeando URL. | Desktop. | Nav inline en `header.tsx` solo con 4 enlaces. | Añadir un menú "Más ▾" en desktop (posición a la derecha del Pro accent) con submenu de páginas secundarias. En mobile, esas mismas rutas vivirán en el tab "Más". |
+| **C4** | 🟡 | El X de cerrar sidebar en `header.tsx` aparece pegado al wordmark sin separación; en mobile además se ve como botón "huérfano" al inicio del header. | Mobile. | Sin `border-r` separador entre toggle y logo. | Añadir un `<span>` divisor o margen visible. |
+| **C5** | 🟡 | No hay "skip to content" link para teclado / a11y. | Todas. | – | Añadir `<a href="#main">Saltar al contenido</a>` al inicio de `<body>` (visualmente oculto, visible al focus). |
+| **C6** | 🟡 | El badge `📍 Madrid, España` del header desktop es decorativo (no clicable) y duplica el indicador de ubicación que ya hay en el sidebar/widgets. Conviene convertirlo en botón → abre modal de cambio de ubicación o lleva a `/location/[slug]`. | Desktop. | `<div>` no `<button>`. | Convertir a `<Link>`/`<button>`. |
+
+#### D. Paridad de funcionalidades web ↔ móvil
+
+> Regla **inviolable**: cada feature debe ser accesible y usable en ambos breakpoints. Si una columna está vacía, abrir TODO.
+
+| Funcionalidad | Desktop | Mobile | Acción |
+|---------------|---------|--------|--------|
+| Cambio de capa meteorológica | ✅ Sidebar siempre visible | ⚠️ Sólo via sidebar overlay | OK tras arreglar B2/C2. Añadir además gesto: doble-tap en chip de capa para fijar. |
+| Time-slider (forecastHourOffset) | ✅ Sticky bottom | ⚠️ Visible pero estrecho, controles play/pause se cortan en pantallas <380px | Hacer el time-slider un drawer secundario o mover controles a esquinas. |
+| Multi-modelo selector | ✅ Sidebar | ⚠️ Sidebar overlay | OK. |
+| Comparador de ciudades | ✅ Grid 4 columnas | ❌ Cards no se renderizan en móvil (skeleton infinito hasta scroll) | Verificar `useQueries` enabled en SSR y forzar refetch onMount. Layout: snap-x carrusel obligatorio <md. |
+| Caza-tormentas (StormHunter) | ✅ FAB con label | ⚠️ FAB se sale por la derecha (B7) | Reposicionar y dejar el banner top centrado siempre visible. |
+| Outdoor mode | ✅ Toggle en header | ⚠️ Toggle en header pero icono solapado (B8) | Mover a sidebar / drawer de ajustes en mobile. |
+| Theme toggle | ✅ Header | ⚠️ Header pero solapado | Misma acción que outdoor. |
+| Búsqueda de ubicación | ✅ Header con autocomplete | ❌ Solapado por el wordmark (B1) | Rediseñar header móvil: search como segunda fila o trigger que despliegue overlay full-width. |
+| Favoritos | ✅ Star en header + sidebar | ⚠️ Star visible pero sidebar persistente | Igual que C2. |
+| AI Chat | ✅ FAB | ⚠️ FAB tapa "Más" (B4) | Reposicionar `bottom: calc(64px + 16px + env(safe-area-inset-bottom))` cuando hay bottom-nav. |
+| PWA install | ✅ Banner discreto | ⚠️ Banner del navegador (Chrome) duplica info | Detectar `beforeinstallprompt` y suprimir nuestro banner si Chrome ya lo muestra. |
+| PrecipNow / Outfit / SunArc | ✅ Visible en widget panel | ⚠️ Visible en drawer "Ahora" pero PrecipNow sin sparkline (A8) | Fix A8. |
+| Mapa interactivo | ✅ Fullscreen | ⚠️ Fullscreen pero sidebar tapa (B2) | Fix B2. |
+| Spaghetti chart (`/pro`) | ✅ Visible | ❓ No comprobado en mobile (faltan capturas) | Auditar y asegurar scroll horizontal de la gráfica. |
+| Hub `/ciudades` | ✅ Pill-nav países | ❓ Verificar si pill-nav stickea en mobile | Audit pendiente. |
+
+### 7.1 Plan de remediación (TODOs)
+
+> Cada TODO se inserta en SQLite (`todos`) al ejecutar la fase. IDs kebab-case, descripciones autocontenidas.
+
+**Sprint 7A — Stop-the-bleeding (defectos 🔴 visibles al primer paint):**
+- [ ] `t7-light-theme-tokens` — Sustituir TODO uso de `text-white/XX`, `bg-gray-950/XX` y `border-white/XX` en `app/**/page.tsx` y componentes layout por tokens semánticos (`text-foreground`, `text-muted-foreground`, `bg-background`, `bg-card`, `border-border`). Definir variantes light de los tokens en `globals.css`. Resuelve A1, A2, A4, A9, A10.
+- [ ] `t7-sidebar-default-closed` — En `weather-store.ts:65`, cambiar `sidebarOpen: true → false`. Añadir hidratación que abra la sidebar automáticamente sólo si `window.matchMedia('(min-width: 1024px)').matches` y la ruta está en `MAP_ROUTES`. Resuelve B2.
+- [ ] `t7-header-mobile-redesign` — Rediseñar `header.tsx` para mobile: una sola fila con `[Toggle][Logo↔]` a la izquierda y `[Search⤢][Star][Theme][Outdoor]` a la derecha. La búsqueda en mobile es un `<button>` con icono de lupa que abre un overlay full-screen con input + lista de sugerencias. Resuelve B1, B8, C4. Añadir `min-w-0 flex-1` al wrapper del wordmark y `hidden xs:inline` al texto "AetherCast".
+- [ ] `t7-fab-stacking` — Definir variable CSS `--bottom-nav-h: 64px` e introducir clase `.fab-above-nav { bottom: calc(var(--bottom-nav-h) + 1rem + env(safe-area-inset-bottom)); }`. Aplicar a AI chat FAB y a controles maplibre (`Geolocate`, `Zoom`). Resuelve B4, B5.
+- [ ] `t7-stormhunter-position` — En `storm-hunter.tsx`, usar `right-4` en mobile + `lg:right-[26rem]` en desktop, asegurando que su contenedor padre permita `position: fixed` o `position: absolute` sin overflow clipping. Resuelve B7.
+
+**Sprint 7B — Navegación coherente:**
+- [ ] `t7-context-aware-sidebar` — En `sidebar.tsx`, leer `usePathname()`. Definir `MAP_ROUTES = ['/']`, `DATA_ROUTES = ['/dashboard','/comparador','/pro','/climate','/alerts']`, `INFO_ROUTES = ['/sobre','/precios','/landing','/legal/*','/ciudades']`. En INFO_ROUTES no renderizar la sidebar. En DATA_ROUTES mostrar favoritos + ajustes. En MAP_ROUTES capas + modelo. Resuelve C2.
+- [ ] `t7-header-more-menu` — Añadir dropdown "Más ▾" en `header.tsx` con submenu desktop: Ciudades / Alertas / Clima / Precios / Sobre. Implementar con shadcn `DropdownMenu` o `Popover`. Resuelve C3.
+- [ ] `t7-bottom-nav-comparar` — Modificar `mobile-bottom-nav.tsx` a 5 tabs: Mapa · Panel · **Comparar** · Pro · Más. El tab "Más" abre un sheet con: Ciudades / Alertas / Clima / Sobre / Precios / Theme / Outdoor / Idioma. Resuelve C1.
+- [ ] `t7-skip-to-content` — Añadir link "Saltar al contenido" al inicio del body (clase `sr-only focus:not-sr-only ...`). Resuelve C5.
+- [ ] `t7-location-badge-clickable` — Convertir el badge `📍 {locationName}` del header en `<button>` que abre el modal de búsqueda. Resuelve C6.
+
+**Sprint 7C — Datos / widgets / parity:**
+- [ ] `t7-comparador-mobile-layout` — Verificar y forzar carrusel `flex snap-x snap-mandatory` con cards `w-[78vw] shrink-0` <md. Validar `useQueries` enabled de inicio para las 3 ciudades por defecto (Barcelona, Valencia). Si SSR no hidrata, forzar `refetchOnMount: 'always'`. Cubre paridad row "Comparador".
+- [ ] `t7-overlay-yellow-fallback` — En `weather-overlay.tsx`, identificar el path donde el overlay de temperatura cae a un color sólido en `/pro` y reemplazarlo por: skeleton de mapa + toast "Sin datos en esta capa para esta vista". Resuelve A6.
+- [ ] `t7-humidity-widget-resize` — Aplicar el mismo patrón `useMounted + height numérico` que se usa en otros widgets de Recharts al `HumidityWidget`. Resuelve A7.
+- [ ] `t7-precip-now-svg-resize` — En `precip-now.tsx` reservar ancho fijo (e.g. `w-[280px]`) o usar `ResizeObserver` antes de pintar las barras. Resuelve A8.
+- [ ] `t7-pwa-banner-dedupe` — Detectar si Chrome ha mostrado su nativo (no hay forma 100%, pero podemos chequear `getInstalledRelatedApps()` y/o suprimir nuestro banner los primeros 5s tras el `beforeinstallprompt`). Reduce ruido B6.
+
+**Sprint 7D — Pulido y verificación dual:**
+- [ ] `t7-time-slider-mobile` — Rediseñar para pantallas <380px: play/pause como botón circular único + slider full-width debajo. O integrarlo en el drawer con su propio handle.
+- [ ] `t7-gradient-text-light-variant` — Añadir variantes `.text-gradient-aurora-on-light` y `.text-gradient-sky-on-light` en `globals.css` con stops legibles, y aplicar la utility correcta según `dark`/`light` (Tailwind v4 `@variant`). Resuelve A3.
+- [ ] `t7-landing-phone-preview` — Reemplazar el mockup vacío por un `<Image>` estático (PNG en `public/landing/phone.png`) o un componente real con datos demo precomputados (no fetch). Resuelve A5.
+- [ ] `t7-route-tour-playwright` — Añadir un test Playwright que recorra todas las rutas en 3 viewports (390, 768, 1440) y verifique: (a) ningún elemento tiene `color === backgroundColor`, (b) bottom-nav siempre visible en <md, (c) sidebar inicialmente cerrada en <md, (d) ningún FAB pisa el bottom-nav (bounding-box no overlap).
+- [ ] `t7-shots-folder-gitignore` — Añadir `.shots/` a `.gitignore`.
+
+### 7.2 Criterio de aceptación de Fase 7
+
+Una vez completados los 4 sprints:
+
+1. **Modo claro y oscuro ambos legibles**: en cada ruta del array de tour, ningún `<p>`, `<h*>`, `<a>` ni `<button>` tiene contraste calculado <4.5:1.
+2. **Header móvil sin solapamientos**: `boundingClientRect` del logo, search trigger y botones del header no se intersectan en viewports 360, 390, 412, 430.
+3. **Sidebar cerrada al primer paint en mobile** y abierta en desktop ≥1024px sólo en rutas de mapa/datos.
+4. **Bottom-nav presente en TODAS las rutas mobile**, con 5 tabs incluyendo Comparar, sin FAB ni control de mapa por encima.
+5. **Tabla de paridad sección 7.0.D**: todas las celdas en ✅. Cada feature accesible en ambos breakpoints en ≤2 taps/clicks.
+6. **Lighthouse mobile en `/`, `/dashboard`, `/comparador`, `/pro`, `/landing`, `/sobre`**: Performance ≥90, Accessibility = 100, Best Practices ≥95.
+7. **Test Playwright `t7-route-tour-playwright` pasando**.
+8. **`pnpm build` limpio** y captura comparativa antes/después en `.shots/before-after/`.
+
+### 7.3 Cómo reproducir el entorno de auditoría
+
+```powershell
+# Dev server (importante: NO usar turbopack por el bug edge-runtime + output:'export')
+npx next dev --port 3000
+
+# Edge en modo debug (perfil aislado para evitar el welcome flow)
+$env:TEMP\edge-debug-profile lo crea en %TEMP%
+Start-Process msedge.exe -ArgumentList @(
+  '--remote-debugging-port=9222',
+  "--user-data-dir=$env:TEMP\edge-debug-profile",
+  'about:blank'
+)
+
+# Emulador Android + reverse del puerto del host
+Start-Process emulator.exe -ArgumentList @('-avd','Pixel_7_API_34_RosaFinanzas')
+adb wait-for-device
+adb reverse tcp:3000 tcp:3000
+```
+
+Capturas:
+- Edge: usar `edge-devtools-take_screenshot` (MCP) en `pageIndex:1`.
+- Emulador: usar `mobile-mcp-mobile_save_screenshot` con `saveTo` dentro del repo (`.shots/mobile/...`) — el MCP no permite paths fuera del cwd.
+
+---
+
+# 🌩️ AetherCast — Roadmap original de 6 Fases (histórico)
 
 > **Generado**: 2026-04-24 tras auditoría en vivo de https://tiempo-meteorologia.pages.dev/ con Edge DevTools MCP
 > **Objetivo**: Convertir AetherCast en la mejor web de meteorología en español, superando a Windy, Ventusky, Meteoblue y AccuWeather en UX mobile, SEO y rendimiento.
 > **Premisa**: 70% del tráfico es mobile → todo se diseña primero para 360–430 px y luego se escala.
+
+---
+
+## ✅ Fase 7 — UI/UX parity Web ↔ Mobile (COMPLETADA · 2026-04-24)
+
+| Cambio | Detalle |
+|--------|---------|
+| **Hoist `<Header />` + `<MobileBottomNav />` a root layout** | `src/app/layout.tsx` ahora monta header global + bottom-nav dentro de `<Providers>`. Eliminadas 16 referencias inline (`<Header/>`, `<MobileBottomNav/>` + imports) en 8 páginas: `/`, `/dashboard`, `/comparador`, `/pro`, `/sobre`, `/ciudades`, `/climate`, `/alerts`, `/map`. **Garantiza paridad funcional** entre todas las rutas en desktop y mobile sin código duplicado. |
+| **MobileBottomNav 5-tabs robusto** | Reescrito con `display: grid; gridTemplateColumns: 'repeat(5, minmax(0, 1fr))'` inline (a prueba de purgas Tailwind). Tabs: Mapa · Panel · Comparar · Pro · Más. Establece CSS var `--bottom-nav-h` que cascada a hijos. |
+| **CSS var `--bottom-nav-h`** | Definida en `globals.css` como `0px` por defecto, `calc(56px + env(safe-area-inset-bottom))` en `<768px`. Usada por `widget-panel`, `pwa-install`, `ai/chat`, `storm-hunter` para evitar solapamiento con bottom-nav en mobile. |
+| **Drawer offset above bottom-nav** | `Drawer.Content` en `widget-panel.tsx` con `style={{ bottom: 'var(--bottom-nav-h, 0px)', height: 'calc(92dvh - var(--bottom-nav-h, 0px))' }}`. Antes: el drawer cubría el bottom-nav y bloqueaba navegación. |
+| **Header restructure mobile-first** | `src/components/layout/header.tsx`: search inline en desktop / sheet full-screen en mobile, dropdown "Más" para nav secundaria, toggle sidebar gated por `usePathname()` a MAP_ROUTES (`['/']`) — antes aparecía en rutas sin mapa y rompía layout. |
+| **Sidebar gated** | `src/components/layout/sidebar.tsx` retorna `null` fuera de MAP_ROUTES. Estado `sidebarOpen` default → `false` en `weather-store.ts` (antes el drawer se abría tapando hero). `app/page.tsx` lo abre via `useEffect` solo en desktop (`window.matchMedia('(min-width: 1024px)').matches`). |
+| **AIChat parity** | FAB + panel con offsets responsive: `bottom: calc(var(--bottom-nav-h, 0px) + 1rem)`, `right-3 left-3 sm:right-6 sm:left-auto sm:w-96`. Pendiente Fase 8: hoist a root layout para aparecer también en `/dashboard /comparador /pro` (actualmente solo `/` y `/landing`). |
+| **StormHunter fixed positioning** | `src/components/map/storm-hunter.tsx` con `fixed` + safe-area-aware top calc para no chocar con header/sidebar/AI chat. |
+| **Dark-only enforcement** | `<html className="dark" style={{ colorScheme: 'dark' }}>` SSR fijo. **Eliminado** `ThemeProvider` (next-themes 0.4.6 rompía hidratación en mobile). **Eliminadas** ~120 líneas de overrides `html:not(.dark)` con `!important` en `globals.css` que provocaban flash blanco permanente cuando faltaba `.dark` por un instante. App es dark-only hasta Fase 8 (re-tokenización con CSS vars semánticas). |
+| **PWA banner offset** | `src/components/layout/pwa-install.tsx`: `bottom: calc(var(--bottom-nav-h, 0px) + 0.75rem)`. |
+
+**⚠️ Lecciones críticas (consultar antes de Fase 8):**
+- **Turbopack en Next 16.2.4 NO compila clases arbitrarias de Tailwind v4** (`bg-[#0b1020]`, `grid-cols-5`, etc.) — el CSS final no contiene esas reglas. Para dev SIEMPRE usar `npx next dev --webpack`. Production build (webpack por defecto) funciona perfecto. Reevaluar al actualizar Next/Turbopack.
+- **Next 16 App Router rechaza `<script dangerouslySetInnerHTML>` dentro de `<head>`** — error "Scripts inside React components are never executed". Si necesitas script pre-hydration, usar `next/script` con `strategy="beforeInteractive"`.
+- **next-themes 0.4.6 + mobile** rompe hidratación incluso con `forcedTheme`. Si en Fase 8 se reintroduce light theme, gestionarlo con CSS vars + media query `prefers-color-scheme`, NO con next-themes.
+- **`html:not(.dark) { ... !important }` es un footgun** — un solo render sin `.dark` deja la UI en blanco permanente. Cualquier override de tema debe ir bajo selectores que coexistan, no que se excluyan.
+- **Validación mobile**: Chrome 113 del emulador Android estándar es demasiado antiguo para Tailwind v4 (oklch, color-mix, @property). Usar **Edge mobile-emulation** vía CDP (`Emulation.setDeviceMetricsOverride` + UA Pixel 7) como fuente primaria de validación mobile. Patrón en `.shots/mobile-emulate.js` (ignored).
+- **Hoisting layout vs duplicación**: Header/MobileBottomNav en root layout es la única forma de garantizar paridad sin drift entre rutas. Si una ruta necesita ocultarlos, hacerlo con `usePathname()` desde el propio componente, no quitándolos de la página.
+
+**Validaciones ejecutadas:**
+- `pnpm type-check` ✅ 0 errores
+- `pnpm lint` ✅ baseline preservada (4 errores pre-existentes Phase 1-4, 0 nuevos)
+- `pnpm build` ✅ webpack, 46s compile, 180 páginas estáticas
+- Tour Edge mobile-emulation Pixel 7 (412×915) ✅ `/`, `/dashboard`, `/comparador`, `/pro`, `/sobre`: header global + bottom-nav 5 tabs + dark theme + drawer no solapa nav.
+
+**Pendiente Fase 8 (post-parity):**
+- Re-tokenizar con CSS vars semánticas (`--bg-base`, `--bg-surface`, `--fg-primary`...) para soporte light theme sin `:not(.dark)`.
+- Hoist `<AIChat />` a root layout para aparecer en todas las rutas.
+- Actualizar Next/Tailwind cuando Turbopack soporte clases arbitrarias v4 → eliminar flag `--webpack` de scripts dev.
 
 ---
 

@@ -3,6 +3,7 @@
 import {
   Thermometer, Wind, CloudRain, Cloud, Eye, Sun, Gauge, Droplets, Snowflake, Zap, Star, Trash2,
 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useWeatherStore } from '@/lib/stores';
 import type { WeatherLayer } from '@/types';
 import { cn } from '@/lib/utils';
@@ -30,12 +31,20 @@ const LAYER_CONFIG: {
   { id: 'snowfall', label: 'Nevada', icon: Snowflake, color: 'text-slate-300' },
 ];
 
+// Routes where the layer panel + favorites combo is meaningful (the live map).
+const MAP_ROUTES = ['/'];
+
 export function Sidebar() {
   const {
     sidebarOpen, activeLayers, toggleLayer, selectedModel, setSelectedModel,
     favorites, removeFavorite, setSelectedLocation,
   } = useWeatherStore();
+  const pathname = usePathname();
 
+  // The sidebar is map-centric. On informational/data pages we don't show it
+  // because its primary content (layers) wouldn't apply.
+  const isMapRoute = MAP_ROUTES.includes(pathname);
+  if (!isMapRoute) return null;
   if (!sidebarOpen) return null;
 
   return (

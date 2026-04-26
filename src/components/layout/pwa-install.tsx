@@ -30,7 +30,10 @@ export function PWAInstall() {
   if (!evt || hidden) return null;
 
   return (
-    <div className="fixed left-4 right-4 bottom-20 z-40 mx-auto flex max-w-sm items-center gap-3 rounded-2xl border border-sky-400/30 bg-[#0b1020]/95 p-3 shadow-2xl backdrop-blur-md md:left-4 md:right-auto md:bottom-6 md:max-w-xs">
+    <div
+      className="fixed left-3 right-3 z-40 mx-auto flex max-w-sm items-center gap-3 rounded-2xl border border-sky-400/30 bg-[#0b1020]/95 p-3 shadow-2xl backdrop-blur-md md:left-4 md:right-auto md:bottom-6 md:max-w-xs"
+      style={{ bottom: 'calc(var(--bottom-nav-h, 0px) + 0.75rem)' }}
+    >
       <Download className="h-5 w-5 shrink-0 text-sky-400" />
       <div className="flex-1 text-sm">
         <p className="font-semibold text-white">Instalar AetherCast</p>
