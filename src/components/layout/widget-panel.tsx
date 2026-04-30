@@ -33,7 +33,7 @@ const TABS = [
 // Snap points anchored to viewport BOTTOM (vaul default).
 // Peek = nav (~56px) + tabs strip (~52px) = ~108px so the tabs row sits
 // fully visible just above the bottom-nav.
-const SNAP_POINTS = ['108px', 0.55, 0.95] as const;
+const SNAP_POINTS = ['148px', 0.55, 0.95] as const;
 
 function PanelContent({ tab }: { tab: Tab }) {
   switch (tab) {

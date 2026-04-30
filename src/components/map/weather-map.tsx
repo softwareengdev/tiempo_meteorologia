@@ -9,6 +9,7 @@ import { useWeatherOverlay, type WindGridSample } from './weather-overlay';
 import { MapLegend } from './map-legend';
 import { TimeSlider } from './time-slider';
 import { WindParticles } from './wind-particles';
+import { StormHunter } from './storm-hunter';
 
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 const MAP_STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
@@ -129,20 +130,27 @@ export function WeatherMap() {
     <div className="relative h-full w-full">
       <div ref={mapContainer} className="h-full w-full" />
       <WindParticles map={mapInstance} grid={windGrid} />
-      <MapLegend />
       <TimeSlider />
-      <div className="pointer-events-none absolute top-[4.25rem] left-1/2 z-10 -translate-x-1/2">
-        <button
-          type="button"
-          onClick={() => setSearchOpen(true)}
-          className="pointer-events-auto flex max-w-[78vw] items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1020]/80 px-3 py-1.5 text-[13px] font-medium text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white sm:hidden"
-          aria-label={`Cambiar ubicación. Actual: ${locationName}`}
-        >
-          <span aria-hidden="true">📍</span>
-          <span className="truncate">{locationName}</span>
-        </button>
-        <div className="pointer-events-auto hidden rounded-full border border-white/10 bg-[#0b1020]/85 px-4 py-1.5 backdrop-blur-md shadow-lg sm:block">
-          <p className="text-[13px] font-medium text-white/80">📍 {locationName}</p>
+
+      {/* Top row of map controls — Capas (left) · Ubicación (center) · Caza (right).
+          Pinned to the very top of the map area, perfectly aligned. */}
+      <div className="pointer-events-none absolute inset-x-2 top-2 z-10 flex items-start justify-between gap-2">
+        <div className="flex w-[40vw] max-w-[260px] shrink-0 justify-start">
+          <MapLegend />
+        </div>
+        <div className="flex flex-1 justify-center">
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="pointer-events-auto flex max-w-full items-center gap-1.5 truncate rounded-full border border-white/15 bg-[#0b1020]/70 px-3 py-1.5 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white"
+            aria-label={`Cambiar ubicación. Actual: ${locationName}`}
+          >
+            <span aria-hidden="true">📍</span>
+            <span className="max-w-[40vw] truncate sm:max-w-none">{locationName}</span>
+          </button>
+        </div>
+        <div className="flex shrink-0 justify-end">
+          <StormHunter />
         </div>
       </div>
     </div>

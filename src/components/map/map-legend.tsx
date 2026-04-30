@@ -25,10 +25,10 @@ const LABELS: Record<WeatherLayer, { name: string; min: string; max: string }> =
 };
 
 /**
- * MapLegend — collapsed by default into a discreet "i" pill in the top-left
- * of the map. Tap to expand into a glass card showing the colour scale of
- * every active layer. Keeps the map almost entirely visible on mobile while
- * still letting users decode what each colour means.
+ * MapLegend — collapsed by default into a discreet "Capas" pill (rendered
+ * by the parent map at the top-left). When expanded, shows a fully
+ * transparent stack of glass legend cards (one per active layer) anchored
+ * to the same top-left anchor; max 40% of the viewport width on mobile.
  */
 export function MapLegend() {
   const activeLayers = useWeatherStore((s) => s.activeLayers);
@@ -37,13 +37,13 @@ export function MapLegend() {
   if (!activeLayers.length) return null;
 
   return (
-    <div className="absolute top-[4.25rem] left-3 z-10 flex flex-col items-start gap-2 md:top-20 md:left-4">
+    <div className="pointer-events-auto flex flex-col items-start gap-1.5">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? 'Ocultar leyenda de capas' : 'Mostrar leyenda de capas'}
-        className="flex items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1020]/80 px-2.5 py-1.5 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/95 hover:text-white"
+        className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1020]/70 px-2.5 py-1.5 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white"
       >
         {open ? <X className="h-3.5 w-3.5" /> : <Info className="h-3.5 w-3.5 text-sky-300" />}
         <span>Capas</span>
@@ -55,26 +55,28 @@ export function MapLegend() {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -6, scale: 0.98 }}
+            initial={{ opacity: 0, y: -4, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -6, scale: 0.98 }}
-            transition={{ duration: 0.18 }}
-            className="flex max-h-[calc(100dvh-14rem)] w-[min(78vw,260px)] flex-col gap-2 overflow-y-auto rounded-2xl border border-white/12 bg-[#0b1020]/88 p-2.5 shadow-2xl backdrop-blur-2xl backdrop-saturate-150"
+            exit={{ opacity: 0, y: -4, scale: 0.98 }}
+            transition={{ duration: 0.16 }}
+            // Fully transparent container, transparent custom scrollbar.
+            // Each item carries its own translucent glass background.
+            className="legend-scroll flex max-h-[calc(100dvh-12rem)] w-[40vw] max-w-[260px] flex-col gap-1.5 overflow-y-auto bg-transparent p-0 shadow-none"
           >
-            <p className="px-1 text-[10px] font-semibold tracking-wider text-white/45 uppercase">
-              Leyenda · {activeLayers.length} {activeLayers.length === 1 ? 'capa activa' : 'capas activas'}
-            </p>
             {activeLayers.map((layer) => {
               const stops = LAYER_COLORS[layer];
               const meta = LABELS[layer];
               const gradient = `linear-gradient(to right, ${stops.join(', ')})`;
               return (
-                <div key={layer} className="rounded-xl border border-white/8 bg-white/5 p-2">
-                  <div className="mb-1 text-[11px] font-semibold tracking-wide text-white/85">
+                <div
+                  key={layer}
+                  className="rounded-xl border border-white/10 bg-[#0b1020]/55 p-2 backdrop-blur-md backdrop-saturate-150 shadow-md"
+                >
+                  <div className="mb-1 truncate text-[11px] font-semibold tracking-wide text-white/90">
                     {meta.name}
                   </div>
-                  <div className="h-2 w-full rounded-full" style={{ background: gradient }} />
-                  <div className="mt-1 flex justify-between text-[10px] text-white/55">
+                  <div className="h-1.5 w-full rounded-full" style={{ background: gradient }} />
+                  <div className="mt-1 flex justify-between text-[10px] text-white/55 tabular-nums">
                     <span>{meta.min}</span>
                     <span>{meta.max}</span>
                   </div>
