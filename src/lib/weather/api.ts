@@ -4,14 +4,36 @@ const OPEN_METEO_BASE = process.env.NEXT_PUBLIC_OPEN_METEO_BASE || 'https://api.
 /** Cloudflare Pages Function that proxies + caches Open-Meteo. Local dev returns 404 → we fallback. */
 const PROXY_BASE = '/api/wx/grid';
 
-/** Prefer same-origin proxy (single egress IP, edge cache, no per-user 429). Fallback to direct. */
+/** Prefer same-origin proxy (single egress IP, edge cache, no per-user 429).
+ *  Falls back to direct Open-Meteo when:
+ *   - proxy is not deployed (404, local dev)
+ *   - proxy returns a degraded payload (200 with `error` field — happens when
+ *     Open-Meteo rate-limits the Cloudflare egress IP and the worker returns
+ *     a `current: null` body to avoid throwing)
+ *   - any unexpected non-ok status
+ */
 async function fetchOpenMeteoForecast(params: URLSearchParams): Promise<Response> {
   if (typeof window !== 'undefined') {
     try {
       const proxied = await fetch(`${PROXY_BASE}?${params}`);
-      if (proxied.ok) return proxied;
-      // 404 = proxy not deployed (local dev); anything else retryable falls through
-      if (proxied.status !== 404) return proxied;
+      if (proxied.ok) {
+        // Detect the worker's degraded fallback (200 + { error, current: null }).
+        // We need to inspect the body without consuming the original Response,
+        // so clone first and restore via a fresh Response if it turns out fine.
+        try {
+          const clone = proxied.clone();
+          const txt = await clone.text();
+          if (txt && txt.length < 240 && txt.includes('"error"') && txt.includes('"current":null')) {
+            // Skip degraded payload — fall through to direct Open-Meteo below.
+          } else {
+            return new Response(txt, { status: proxied.status, headers: proxied.headers });
+          }
+        } catch {
+          return proxied;
+        }
+      } else if (proxied.status !== 404) {
+        return proxied;
+      }
     } catch {
       // network error → fallback
     }
