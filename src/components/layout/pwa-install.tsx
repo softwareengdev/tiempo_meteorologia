@@ -31,26 +31,25 @@ export function PWAInstall() {
 
   return (
     <div
-      className="fixed left-3 right-3 z-40 mx-auto flex max-w-sm items-center gap-3 rounded-2xl border border-sky-400/30 bg-[#0b1020]/95 p-3 shadow-2xl backdrop-blur-md md:left-4 md:right-auto md:bottom-6 md:max-w-xs"
+      className="fixed left-3 z-40 flex items-center gap-2 rounded-full border border-sky-400/30 bg-[#0b1020]/92 py-1.5 pl-2.5 pr-1.5 text-xs shadow-lg backdrop-blur-md md:left-4 md:right-auto md:bottom-6"
       style={{ bottom: 'calc(var(--bottom-nav-h, 0px) + 0.75rem)' }}
+      role="region"
+      aria-label="Instalar aplicación"
     >
-      <Download className="h-5 w-5 shrink-0 text-sky-400" />
-      <div className="flex-1 text-sm">
-        <p className="font-semibold text-white">Instalar AetherCast</p>
-        <p className="text-white/60 text-xs">Acceso rápido + funciona offline</p>
-      </div>
+      <Download className="h-3.5 w-3.5 shrink-0 text-sky-400" />
+      <span className="font-medium text-white/90">Instalar app</span>
       <button
         onClick={async () => { await evt.prompt(); setEvt(null); }}
-        className="rounded-lg bg-sky-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-sky-400"
+        className="rounded-full bg-sky-500 px-2.5 py-1 text-[11px] font-semibold text-white hover:bg-sky-400"
       >
-        Instalar
+        Añadir
       </button>
       <button
         onClick={() => setHidden(true)}
         aria-label="Ocultar"
-        className="text-white/40 hover:text-white"
+        className="rounded-full p-0.5 text-white/40 hover:bg-white/10 hover:text-white"
       >
-        <X className="h-4 w-4" />
+        <X className="h-3.5 w-3.5" />
       </button>
     </div>
   );

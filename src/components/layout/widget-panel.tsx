@@ -30,9 +30,10 @@ const TABS = [
   { value: 'detail' as Tab, label: 'Detalles', icon: <BarChart3 className="h-3.5 w-3.5" /> },
 ] as const;
 
-// Peek = ONLY the tabs strip (no big handle). 52px = tabs row.
-// Half = comfortable reading; Full = max height for deep dives.
-const SNAP_POINTS = ['52px', 0.55, 0.95] as const;
+// Snap points anchored to viewport BOTTOM (vaul default).
+// Peek = nav (~56px) + tabs strip (~52px) = ~108px so the tabs row sits
+// fully visible just above the bottom-nav.
+const SNAP_POINTS = ['108px', 0.55, 0.95] as const;
 
 function PanelContent({ tab }: { tab: Tab }) {
   switch (tab) {
@@ -163,11 +164,7 @@ export function WidgetPanel() {
           <Drawer.Portal>
             <Drawer.Content
               aria-label="Panel meteorológico"
-              className="fixed inset-x-0 z-30 mx-auto flex max-w-3xl flex-col rounded-t-2xl border border-white/10 border-b-0 bg-[#0b1020]/92 shadow-[0_-12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-2xl backdrop-saturate-150 outline-none"
-              style={{
-                bottom: 'var(--bottom-nav-h, 0px)',
-                height: 'calc(92dvh - var(--bottom-nav-h, 0px))',
-              }}
+              className="fixed inset-x-0 bottom-0 z-30 mx-auto flex h-[92dvh] max-w-3xl flex-col rounded-t-2xl border border-white/10 border-b-0 bg-[#0b1020]/92 shadow-[0_-12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-2xl backdrop-saturate-150 outline-none"
             >
               <Drawer.Title className="sr-only">Información meteorológica</Drawer.Title>
               <Drawer.Description className="sr-only">
@@ -221,7 +218,8 @@ export function WidgetPanel() {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
-                className="flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(env(safe-area-inset-bottom),6rem)] [&>*]:shrink-0"
+                className="flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pt-2 [&>*]:shrink-0"
+                style={{ paddingBottom: 'calc(var(--bottom-nav-h, 0px) + 1.5rem)' }}
               >
                 <PanelContent tab={tab} />
               </div>
