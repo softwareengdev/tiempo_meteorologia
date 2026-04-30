@@ -22,6 +22,8 @@ export function WeatherMap() {
   const { resolvedTheme } = useTheme();
   const { mapView, setMapView, selectedLocation, setSelectedLocation, locationName, activeLayers } =
     useWeatherStore();
+  const panelHeightPx = useWeatherStore((s) => s.panelHeightPx);
+  const setSearchOpen = useWeatherStore((s) => s.setSearchOpen);
 
   useWeatherOverlay({ map: mapInstance, activeLayers, onWindGrid: setWindGrid });
 
@@ -117,8 +119,11 @@ export function WeatherMap() {
       center: [selectedLocation.longitude, selectedLocation.latitude],
       zoom: Math.max(mapRef.current.getZoom(), 8),
       duration: 1500,
+      // Bias the visual center upward so the marker isn't hidden behind
+      // the bottom info panel on mobile.
+      padding: { top: 80, bottom: panelHeightPx + 40, left: 24, right: 24 },
     });
-  }, [selectedLocation]);
+  }, [selectedLocation, panelHeightPx]);
 
   return (
     <div className="relative h-full w-full">
@@ -126,11 +131,18 @@ export function WeatherMap() {
       <WindParticles map={mapInstance} grid={windGrid} />
       <MapLegend />
       <TimeSlider />
-      <div className="pointer-events-none absolute top-[4.5rem] left-1/2 z-10 -translate-x-1/2">
-        <div className="pointer-events-auto rounded-full border border-white/10 bg-[#0b1020]/85 px-4 py-1.5 backdrop-blur-md shadow-lg">
-          <p className="text-[13px] font-medium text-white/80">
-            📍 {locationName}
-          </p>
+      <div className="pointer-events-none absolute top-[4.25rem] left-1/2 z-10 -translate-x-1/2">
+        <button
+          type="button"
+          onClick={() => setSearchOpen(true)}
+          className="pointer-events-auto flex max-w-[78vw] items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1020]/80 px-3 py-1.5 text-[13px] font-medium text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white sm:hidden"
+          aria-label={`Cambiar ubicación. Actual: ${locationName}`}
+        >
+          <span aria-hidden="true">📍</span>
+          <span className="truncate">{locationName}</span>
+        </button>
+        <div className="pointer-events-auto hidden rounded-full border border-white/10 bg-[#0b1020]/85 px-4 py-1.5 backdrop-blur-md shadow-lg sm:block">
+          <p className="text-[13px] font-medium text-white/80">📍 {locationName}</p>
         </div>
       </div>
     </div>

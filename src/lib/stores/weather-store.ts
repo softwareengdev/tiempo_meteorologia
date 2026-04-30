@@ -42,6 +42,15 @@ interface WeatherStore {
   toggleOutdoorMode: () => void;
   stormHunter: boolean;
   toggleStormHunter: () => void;
+  /** Pixels of the bottom panel currently visible on screen. Used by the
+   * map to bias flyTo padding so the selected marker is centered in the
+   * remaining visible area. */
+  panelHeightPx: number;
+  setPanelHeightPx: (h: number) => void;
+  /** Mobile floating search modal visibility. Lifted to the store so any
+   * map overlay (e.g. the location pill) can open it. */
+  searchOpen: boolean;
+  setSearchOpen: (open: boolean) => void;
 }
 
 export const useWeatherStore = create<WeatherStore>()(
@@ -127,6 +136,12 @@ export const useWeatherStore = create<WeatherStore>()(
           const merged = Array.from(new Set([...state.activeLayers, ...need]));
           return { stormHunter: true, activeLayers: merged };
         }),
+
+      panelHeightPx: 0,
+      setPanelHeightPx: (h) => set({ panelHeightPx: Math.max(0, Math.round(h)) }),
+
+      searchOpen: false,
+      setSearchOpen: (open) => set({ searchOpen: open }),
     }),
     {
       name: 'aethercast-weather-store',

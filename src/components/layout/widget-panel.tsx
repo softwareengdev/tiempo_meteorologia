@@ -3,7 +3,7 @@
 import { Drawer } from 'vaul';
 import { motion } from 'framer-motion';
 import {
-  Cloud, Sun, Calendar, BarChart3,
+  Cloud, Sun, Calendar, BarChart3, ChevronUp, ChevronDown,
 } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,10 +30,9 @@ const TABS = [
   { value: 'detail' as Tab, label: 'Detalles', icon: <BarChart3 className="h-3.5 w-3.5" /> },
 ] as const;
 
-// Peek = ONLY handle + tabs row visible (no content peek).
+// Peek = ONLY the tabs strip (no big handle). 52px = tabs row.
 // Half = comfortable reading; Full = max height for deep dives.
-// 78px = handle (12) + tabs row (~46) + safety (20).
-const SNAP_POINTS = ['78px', 0.55, 0.95] as const;
+const SNAP_POINTS = ['52px', 0.55, 0.95] as const;
 
 function PanelContent({ tab }: { tab: Tab }) {
   switch (tab) {
@@ -88,6 +87,8 @@ function PanelContent({ tab }: { tab: Tab }) {
 export function WidgetPanel() {
   const tab = useWeatherStore((s) => s.mobileTab);
   const setTab = useWeatherStore((s) => s.setMobileTab);
+  const sidebarOpen = useWeatherStore((s) => s.sidebarOpen);
+  const setPanelHeightPx = useWeatherStore((s) => s.setPanelHeightPx);
   const haptic = useHaptic();
   const qc = useQueryClient();
   const isDesktop = useMediaQuery('(min-width: 1024px)');
@@ -103,6 +104,25 @@ export function WidgetPanel() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setOpen(true);
   }, []);
+
+  // Collapse to peek whenever the sidebar opens on mobile, so the layer
+  // panel can be browsed without the bottom panel covering the map.
+  useEffect(() => {
+    if (sidebarOpen && !isDesktop) setSnap(SNAP_POINTS[0]);
+  }, [sidebarOpen, isDesktop]);
+
+  // Publish current snap height (in CSS px) to the store so the map can
+  // bias its flyTo padding and keep the marker centered in the *visible*
+  // map area (above the panel).
+  useEffect(() => {
+    if (isDesktop) { setPanelHeightPx(0); return; }
+    if (typeof window === 'undefined') return;
+    const vh = window.innerHeight;
+    let px = 0;
+    if (typeof snap === 'string' && snap.endsWith('px')) px = parseFloat(snap);
+    else if (typeof snap === 'number') px = snap * vh;
+    setPanelHeightPx(px);
+  }, [snap, isDesktop, setPanelHeightPx]);
 
   const refresh = async () => {
     setRefreshing(true);
@@ -143,28 +163,47 @@ export function WidgetPanel() {
           <Drawer.Portal>
             <Drawer.Content
               aria-label="Panel meteorológico"
-              className="fixed inset-x-0 z-30 mx-auto flex max-w-3xl flex-col rounded-t-3xl border border-white/10 border-b-0 bg-[#0b1020]/95 shadow-[0_-12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-2xl outline-none"
+              className="fixed inset-x-0 z-30 mx-auto flex max-w-3xl flex-col rounded-t-2xl border border-white/10 border-b-0 bg-[#0b1020]/92 shadow-[0_-12px_40px_-8px_rgba(0,0,0,0.6)] backdrop-blur-2xl backdrop-saturate-150 outline-none"
               style={{
                 bottom: 'var(--bottom-nav-h, 0px)',
                 height: 'calc(92dvh - var(--bottom-nav-h, 0px))',
               }}
             >
-              <div className="mx-auto mt-2 mb-1 h-1.5 w-12 shrink-0 rounded-full bg-white/25" />
               <Drawer.Title className="sr-only">Información meteorológica</Drawer.Title>
               <Drawer.Description className="sr-only">
                 Desliza para cambiar entre vista compacta, media y completa.
               </Drawer.Description>
-              <div className="px-3 pb-2 pt-0.5">
-                <SegmentedTabs<Tab>
-                  ariaLabel="Secciones meteorológicas"
-                  tabs={TABS}
-                  value={tab}
-                  onChange={(v) => {
-                    setTab(v);
-                    // If currently peeking, expand to half so user sees content.
-                    if (snap === SNAP_POINTS[0]) setSnap(SNAP_POINTS[1]);
+              {/* Tabs row also acts as the drag handle (vaul handles drag from header). */}
+              <div className="relative flex items-center gap-2 px-3 pt-2 pb-1.5">
+                <span aria-hidden="true" className="pointer-events-none absolute top-1 left-1/2 h-1 w-10 -translate-x-1/2 rounded-full bg-white/20" />
+                <div className="flex-1">
+                  <SegmentedTabs<Tab>
+                    ariaLabel="Secciones meteorológicas"
+                    tabs={TABS}
+                    value={tab}
+                    onChange={(v) => {
+                      setTab(v);
+                      // If currently peeking, expand to half so user sees content.
+                      if (snap === SNAP_POINTS[0]) setSnap(SNAP_POINTS[1]);
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = snap === SNAP_POINTS[0]
+                      ? SNAP_POINTS[1]
+                      : SNAP_POINTS[0];
+                    haptic('light');
+                    setSnap(next);
                   }}
-                />
+                  aria-label={snap === SNAP_POINTS[0] ? 'Expandir panel' : 'Minimizar panel'}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-white/55 hover:bg-white/10 hover:text-white"
+                >
+                  {snap === SNAP_POINTS[0]
+                    ? <ChevronUp className="h-4 w-4" />
+                    : <ChevronDown className="h-4 w-4" />}
+                </button>
               </div>
               {refreshing && (
                 <motion.div
