@@ -88,23 +88,23 @@ export function LocationSearch() {
         </div>
 
         {isOpen && results.length > 0 && (
-          <div className="absolute top-full right-0 z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl border border-white/10 bg-gray-900/95 shadow-2xl backdrop-blur-xl">
+          <div className="absolute top-full right-0 z-50 mt-2 w-80 max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl border border-white/15 bg-[#0b1020] shadow-2xl ring-1 ring-black/40">
             {results.map((result) => (
               <button
                 key={result.id}
                 onClick={() => handleSelect(result)}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-white/10"
+                className="flex w-full items-center gap-3 border-b border-white/5 px-4 py-3 text-left transition-colors last:border-b-0 hover:bg-white/10"
               >
                 <MapPin className="h-4 w-4 shrink-0 text-sky-400" />
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-white">{result.name}</p>
-                  <p className="truncate text-xs text-white/50">
+                  <p className="truncate text-xs text-white/65">
                     {result.admin1 ? `${result.admin1}, ` : ''}
                     {result.country}
                   </p>
                 </div>
                 {result.population && result.population > 0 && (
-                  <span className="ml-auto text-xs text-white/30">
+                  <span className="ml-auto text-xs text-white/45">
                     {result.population.toLocaleString('es')} hab.
                   </span>
                 )}
@@ -131,7 +131,8 @@ export function LocationSearch() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[80] bg-gray-950/95 backdrop-blur-xl sm:hidden"
+            className="fixed inset-0 z-[80] bg-[#0b1020] sm:hidden"
+            style={{ width: '100vw', height: '100dvh' }}
             role="dialog"
             aria-modal="true"
             aria-label="Buscar ubicación"

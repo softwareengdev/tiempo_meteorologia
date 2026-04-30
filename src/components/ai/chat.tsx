@@ -101,16 +101,16 @@ export function AIChat() {
 
   return (
     <>
-      {/* FAB — sits above mobile bottom-nav using --bottom-nav-h. */}
+      {/* FAB — sits above mobile bottom-nav using --bottom-nav-h. Smaller on mobile to avoid covering the rightmost tab. */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed right-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/30 transition-transform hover:scale-110 md:right-6"
-        style={{ bottom: 'calc(var(--bottom-nav-h, 0px) + 1rem)' }}
+        className="fixed right-3 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-sky-500 to-blue-600 shadow-lg shadow-sky-500/30 transition-transform hover:scale-110 sm:right-6 sm:h-14 sm:w-14"
+        style={{ bottom: 'calc(var(--bottom-nav-h, 0px) + 1.25rem)' }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         aria-label="Abrir chat de IA"
       >
-        {isOpen ? <X className="h-6 w-6 text-white" /> : <MessageCircle className="h-6 w-6 text-white" />}
+        {isOpen ? <X className="h-5 w-5 text-white sm:h-6 sm:w-6" /> : <MessageCircle className="h-5 w-5 text-white sm:h-6 sm:w-6" />}
       </motion.button>
 
       {/* Chat panel */}

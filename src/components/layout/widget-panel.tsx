@@ -18,18 +18,22 @@ import {
 } from '@/components/widgets';
 import {
   HourlyChartWidget, WindChartWidget, PressureChartWidget,
+  MeteogramWidget, HumidityWidget, ClimateHistoryWidget, ModelComparisonWidget,
 } from '@/components/widgets/lazy';
 
 type Tab = 'now' | 'today' | 'week' | 'detail';
 
 const TABS = [
-  { value: 'now' as Tab,    label: 'Ahora',  icon: <Cloud className="h-3.5 w-3.5" /> },
-  { value: 'today' as Tab,  label: 'Hoy',    icon: <Sun className="h-3.5 w-3.5" /> },
-  { value: 'week' as Tab,   label: '7 días', icon: <Calendar className="h-3.5 w-3.5" /> },
-  { value: 'detail' as Tab, label: 'Detalle', icon: <BarChart3 className="h-3.5 w-3.5" /> },
+  { value: 'now' as Tab,    label: 'Ahora',    icon: <Cloud className="h-3.5 w-3.5" /> },
+  { value: 'today' as Tab,  label: 'Hoy',      icon: <Sun className="h-3.5 w-3.5" /> },
+  { value: 'week' as Tab,   label: '7 días',   icon: <Calendar className="h-3.5 w-3.5" /> },
+  { value: 'detail' as Tab, label: 'Detalles', icon: <BarChart3 className="h-3.5 w-3.5" /> },
 ] as const;
 
-const SNAP_POINTS = ['96px', 0.5, 0.92] as const;
+// Peek = ONLY handle + tabs row visible (no content peek).
+// Half = comfortable reading; Full = max height for deep dives.
+// 78px = handle (12) + tabs row (~46) + safety (20).
+const SNAP_POINTS = ['78px', 0.55, 0.95] as const;
 
 function PanelContent({ tab }: { tab: Tab }) {
   switch (tab) {
@@ -41,6 +45,7 @@ function PanelContent({ tab }: { tab: Tab }) {
           <OutfitRecommenderWidget />
           <AlertsWidget />
           <AirQualityWidget />
+          <HumidityWidget />
           <SunriseSunsetWidget />
         </>
       );
@@ -48,6 +53,7 @@ function PanelContent({ tab }: { tab: Tab }) {
       return (
         <>
           <HourlyChartWidget />
+          <MeteogramWidget />
           <HourlyDetailWidget />
           <WindChartWidget />
         </>
@@ -56,6 +62,8 @@ function PanelContent({ tab }: { tab: Tab }) {
       return (
         <>
           <DailyForecastWidget />
+          <ClimateHistoryWidget />
+          <ModelComparisonWidget />
         </>
       );
     case 'detail':
@@ -64,6 +72,7 @@ function PanelContent({ tab }: { tab: Tab }) {
           <PressureChartWidget />
           <MarineWidget />
           <AstronomyWidget />
+          <AlertsWidget />
         </>
       );
   }
@@ -145,12 +154,16 @@ export function WidgetPanel() {
               <Drawer.Description className="sr-only">
                 Desliza para cambiar entre vista compacta, media y completa.
               </Drawer.Description>
-              <div className="px-3 pb-2">
+              <div className="px-3 pb-2 pt-0.5">
                 <SegmentedTabs<Tab>
                   ariaLabel="Secciones meteorológicas"
                   tabs={TABS}
                   value={tab}
-                  onChange={(v) => { setTab(v); if (snap === SNAP_POINTS[0]) setSnap(SNAP_POINTS[1]); }}
+                  onChange={(v) => {
+                    setTab(v);
+                    // If currently peeking, expand to half so user sees content.
+                    if (snap === SNAP_POINTS[0]) setSnap(SNAP_POINTS[1]);
+                  }}
                 />
               </div>
               {refreshing && (
@@ -169,7 +182,7 @@ export function WidgetPanel() {
                 onTouchStart={onTouchStart}
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
-                className="flex flex-1 flex-col gap-3 overflow-y-auto overscroll-contain px-3 pt-1 pb-[max(env(safe-area-inset-bottom),5rem)]"
+                className="flex flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-4 pt-2 pb-[max(env(safe-area-inset-bottom),6rem)] [&>*]:shrink-0"
               >
                 <PanelContent tab={tab} />
               </div>

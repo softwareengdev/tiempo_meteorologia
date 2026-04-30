@@ -33,7 +33,9 @@ export function Header() {
     selectedLocation, favorites, addFavorite, removeFavorite,
   } = useWeatherStore();
   const pathname = usePathname();
-  const isFav = favorites.some((f) => f.name === locationName);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const isFav = mounted && favorites.some((f) => f.name === locationName);
   const [moreOpen, setMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement | null>(null);
 

@@ -40,7 +40,7 @@ export function HourlyDetailWidget() {
         Detalle por Horas — Próximas 24h
       </h3>
 
-      <div className="space-y-1 max-h-72 overflow-y-auto">
+      <div className="space-y-1">
         {hours.map((time, idx) => {
           const i = startIndex + idx;
           const date = new Date(time);

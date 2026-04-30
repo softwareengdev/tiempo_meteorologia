@@ -36,9 +36,9 @@ export default function CompararPage() {
         }}
       />
       <main className="min-h-dvh bg-[#0b1020] pt-14 pb-24 text-white md:pb-12">
-        <div className="mx-auto max-w-7xl px-3 py-6 sm:px-6">
-          <header className="mb-6">
-            <h1 className="font-display text-3xl font-bold tracking-tight sm:text-4xl">
+        <div className="mx-auto max-w-7xl px-4 py-5 sm:px-6 sm:py-6">
+          <header className="mb-5 sm:mb-6">
+            <h1 className="font-display text-2xl font-bold tracking-tight sm:text-4xl">
               Comparador de ciudades
             </h1>
             <p className="mt-2 max-w-2xl text-sm text-white/65 sm:text-base">

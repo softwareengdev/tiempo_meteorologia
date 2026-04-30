@@ -94,8 +94,9 @@ export function CityCompareClient() {
         </button>
       </div>
 
-      {/* Mobile: snap-x scroll. Desktop: grid */}
-      <div className="-mx-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-3 pb-2 sm:mx-0 sm:grid sm:snap-none sm:overflow-visible sm:px-0 sm:pb-0"
+      {/* Mobile (<sm): vertical stack full-width. Desktop (≥sm): N-column grid. */}
+      <div
+        className="flex flex-col gap-3 sm:grid sm:gap-4"
         style={{ gridTemplateColumns: `repeat(${cities.length}, minmax(0, 1fr))` }}
       >
         {cities.map((city, idx) => {
@@ -145,7 +146,7 @@ function CityCard({
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
-      className="relative w-[78vw] shrink-0 snap-center overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md sm:w-auto"
+      className="relative w-full overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-md"
     >
       <button
         onClick={onRemove}
@@ -161,9 +162,9 @@ function CityCard({
       </header>
 
       {loading || !current ? (
-        <div className="space-y-3">
+        <div className="space-y-2">
+          <div className="h-16 animate-pulse rounded-xl bg-white/5" />
           <div className="h-20 animate-pulse rounded-xl bg-white/5" />
-          <div className="h-32 animate-pulse rounded-xl bg-white/5" />
         </div>
       ) : (
         <>
