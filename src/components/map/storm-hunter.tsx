@@ -24,7 +24,7 @@ export function StormHunter() {
       aria-label={active ? 'Desactivar modo Caza-tormentas' : 'Activar modo Caza-tormentas'}
       title="Modo Caza-tormentas (CAPE + rachas + precipitación)"
       className={cn(
-        'pointer-events-auto flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-[11px] font-semibold shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors',
+        'pointer-events-auto flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors',
         active
           ? 'border-violet-400/60 bg-gradient-to-r from-indigo-500/45 to-violet-500/45 text-white shadow-[0_0_18px_rgba(139,92,246,0.45)]'
           : 'border-white/15 bg-[#0b1020]/70 text-white/80 hover:bg-[#0b1020]/90 hover:text-white',

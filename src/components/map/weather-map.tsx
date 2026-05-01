@@ -10,6 +10,7 @@ import { MapLegend } from './map-legend';
 import { TimeSlider } from './time-slider';
 import { WindParticles } from './wind-particles';
 import { StormHunter } from './storm-hunter';
+import { CustomMapControls } from './custom-map-controls';
 
 const MAP_STYLE_DARK = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 const MAP_STYLE_LIGHT = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
@@ -52,16 +53,8 @@ export function WeatherMap() {
     });
     mapRef.current = m;
 
-    m.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
-    m.addControl(new maplibregl.ScaleControl(), 'bottom-left');
+    m.addControl(new maplibregl.ScaleControl({ maxWidth: 80, unit: 'metric' }), 'bottom-left');
     m.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-left');
-    m.addControl(
-      new maplibregl.GeolocateControl({
-        positionOptions: { enableHighAccuracy: true },
-        trackUserLocation: true,
-      }),
-      'bottom-right',
-    );
 
     m.on('moveend', () => {
       const center = m.getCenter();
@@ -131,22 +124,23 @@ export function WeatherMap() {
       <div ref={mapContainer} className="h-full w-full" />
       <WindParticles map={mapInstance} grid={windGrid} />
       <TimeSlider />
+      <CustomMapControls map={mapInstance} />
 
       {/* Top row of map controls — Capas (left) · Ubicación (center) · Caza (right).
-          Pinned to the very top of the map area, perfectly aligned. */}
-      <div className="pointer-events-none absolute inset-x-2 top-2 z-10 flex items-start justify-between gap-2">
-        <div className="flex w-[40vw] max-w-[260px] shrink-0 justify-start">
+          Compact pills sized so all three always fit on a 360 px viewport. */}
+      <div className="pointer-events-none absolute inset-x-2 top-2 z-10 flex items-start justify-between gap-1.5">
+        <div className="flex shrink-0">
           <MapLegend />
         </div>
-        <div className="flex flex-1 justify-center">
+        <div className="flex min-w-0 flex-1 justify-center">
           <button
             type="button"
             onClick={() => setSearchOpen(true)}
-            className="pointer-events-auto flex max-w-full items-center gap-1.5 truncate rounded-full border border-white/15 bg-[#0b1020]/70 px-3 py-1.5 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white"
+            className="pointer-events-auto flex max-w-full min-w-0 items-center gap-1 rounded-full border border-white/15 bg-[#0b1020]/70 px-2 py-1 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white"
             aria-label={`Cambiar ubicación. Actual: ${locationName}`}
           >
-            <span aria-hidden="true">📍</span>
-            <span className="max-w-[40vw] truncate sm:max-w-none">{locationName}</span>
+            <span aria-hidden="true" className="text-[12px] leading-none">📍</span>
+            <span className="truncate max-w-[34vw] sm:max-w-[200px]">{locationName}</span>
           </button>
         </div>
         <div className="flex shrink-0 justify-end">

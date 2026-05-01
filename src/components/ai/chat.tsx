@@ -16,7 +16,8 @@ interface ChatMessage {
 }
 
 export function AIChat() {
-  const [isOpen, setIsOpen] = useState(false);
+  const isOpen = useWeatherStore((s) => s.aiChatOpen);
+  const setIsOpen = useWeatherStore((s) => s.setAiChatOpen);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);

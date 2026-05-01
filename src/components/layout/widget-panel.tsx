@@ -114,15 +114,24 @@ export function WidgetPanel() {
 
   // Publish current snap height (in CSS px) to the store so the map can
   // bias its flyTo padding and keep the marker centered in the *visible*
-  // map area (above the panel).
+  // map area (above the panel). Also publishes a global CSS variable
+  // (--panel-h) so map controls (zoom/locate stack, time-slider) can
+  // anchor themselves above the panel without prop drilling.
   useEffect(() => {
-    if (isDesktop) { setPanelHeightPx(0); return; }
+    if (isDesktop) {
+      setPanelHeightPx(0);
+      if (typeof document !== 'undefined') {
+        document.documentElement.style.setProperty('--panel-h', '0px');
+      }
+      return;
+    }
     if (typeof window === 'undefined') return;
     const vh = window.innerHeight;
     let px = 0;
     if (typeof snap === 'string' && snap.endsWith('px')) px = parseFloat(snap);
     else if (typeof snap === 'number') px = snap * vh;
     setPanelHeightPx(px);
+    document.documentElement.style.setProperty('--panel-h', `${Math.round(px)}px`);
   }, [snap, isDesktop, setPanelHeightPx]);
 
   const refresh = async () => {

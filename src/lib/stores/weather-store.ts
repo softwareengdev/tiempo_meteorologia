@@ -51,6 +51,9 @@ interface WeatherStore {
    * map overlay (e.g. the location pill) can open it. */
   searchOpen: boolean;
   setSearchOpen: (open: boolean) => void;
+  /** AI chat panel visibility — used by the install pill to step aside. */
+  aiChatOpen: boolean;
+  setAiChatOpen: (open: boolean) => void;
 }
 
 export const useWeatherStore = create<WeatherStore>()(
@@ -142,6 +145,9 @@ export const useWeatherStore = create<WeatherStore>()(
 
       searchOpen: false,
       setSearchOpen: (open) => set({ searchOpen: open }),
+
+      aiChatOpen: false,
+      setAiChatOpen: (open) => set({ aiChatOpen: open }),
     }),
     {
       name: 'aethercast-weather-store',

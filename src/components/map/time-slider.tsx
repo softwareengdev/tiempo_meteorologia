@@ -33,13 +33,16 @@ export function TimeSlider() {
     : `+${hour}h · ${date.toLocaleString('es', { weekday: 'short', hour: '2-digit', minute: '2-digit' })}`;
 
   return (
-    <div className="pointer-events-auto absolute right-4 bottom-20 z-10 flex w-[min(92vw,560px)] items-center gap-3 rounded-xl border border-white/10 bg-[#0b1020]/90 px-3 py-2 backdrop-blur-md shadow-xl md:right-1/2 md:bottom-6 md:translate-x-1/2">
+    <div
+      className="pointer-events-auto absolute left-1/2 z-20 flex w-[min(86vw,520px)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/12 bg-[#0b1020]/65 pl-1.5 pr-3 py-1 backdrop-blur-md backdrop-saturate-150 shadow-xl"
+      style={{ bottom: 'calc(var(--panel-h, var(--bottom-nav-h, 0px)) + 3.25rem)' }}
+    >
       <button
         onClick={() => setPlaying((p) => !p)}
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-500/20 text-sky-300 transition hover:bg-sky-500/30"
+        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-sky-600 text-white shadow-[0_0_10px_rgba(56,189,248,0.5)] transition hover:from-sky-300 hover:to-sky-500"
         aria-label={playing ? 'Pausar' : 'Reproducir'}
       >
-        {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+        {playing ? <Pause className="h-3.5 w-3.5" /> : <Play className="h-3.5 w-3.5 translate-x-[1px]" />}
       </button>
       <input
         type="range"
@@ -47,10 +50,10 @@ export function TimeSlider() {
         max={47}
         value={hour}
         onChange={(e) => setForecastHourOffset(Number(e.target.value))}
-        className="flex-1 accent-sky-400"
+        className="time-slider-range flex-1"
         aria-label="Hora del pronóstico"
       />
-      <span className="min-w-[110px] text-right text-xs tabular-nums text-white/80">{label}</span>
+      <span className="min-w-[78px] text-right text-[10.5px] font-medium tabular-nums text-white/80">{label}</span>
     </div>
   );
 }

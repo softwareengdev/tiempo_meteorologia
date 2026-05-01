@@ -43,7 +43,7 @@ export function MapLegend() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? 'Ocultar leyenda de capas' : 'Mostrar leyenda de capas'}
-        className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1020]/70 px-2.5 py-1.5 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white"
+        className="flex shrink-0 items-center gap-1 rounded-full border border-white/15 bg-[#0b1020]/70 px-2 py-1 text-[11px] font-semibold text-white/85 shadow-lg backdrop-blur-md backdrop-saturate-150 transition-colors hover:bg-[#0b1020]/90 hover:text-white"
       >
         {open ? <X className="h-3.5 w-3.5" /> : <Info className="h-3.5 w-3.5 text-sky-300" />}
         <span>Capas</span>
