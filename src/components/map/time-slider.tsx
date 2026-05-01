@@ -34,7 +34,7 @@ export function TimeSlider() {
 
   return (
     <div
-      className="pointer-events-auto absolute left-1/2 z-20 flex w-[min(86vw,520px)] -translate-x-1/2 items-center gap-2 rounded-full border border-white/12 bg-[#0b1020]/65 pl-1.5 pr-3 py-1 backdrop-blur-md backdrop-saturate-150 shadow-xl"
+      className="pointer-events-auto absolute left-2 z-20 flex w-[calc(100vw-4rem)] max-w-[520px] items-center gap-2 rounded-full border border-white/12 bg-[#0b1020]/65 pl-1.5 pr-3 py-1 backdrop-blur-md backdrop-saturate-150 shadow-xl md:left-1/2 md:-translate-x-1/2 md:w-[min(86vw,520px)]"
       style={{ bottom: 'calc(var(--panel-h, var(--bottom-nav-h, 0px)) + 3.25rem)' }}
     >
       <button
